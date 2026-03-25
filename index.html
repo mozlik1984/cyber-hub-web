@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyberpunk Movie Hub</title>
+    <script src="https://telegram.org"></script>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #bc13fe;
+            --neon-blue: #05d9e8;
+            --cyber-yellow: #f8ef00;
+            --bg-dark: #0d0d0d;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--cyber-yellow);
+            text-shadow: 0 0 10px rgba(248, 239, 0, 0.5);
+            font-size: 1.5rem;
+            border-left: 4px solid var(--neon-purple);
+            padding-left: 10px;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(188, 19, 254, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .card:active { transform: scale(0.95); border-color: var(--neon-blue); }
+
+        .poster {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #1a1a1a;
+        }
+
+        .title {
+            margin: 8px 0 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--neon-blue);
+        }
+
+        .btn-fav {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 5px;
+            margin-top: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+        }
+
+        /* Сканер-эффект */
+        .scanline {
+            width: 100%; height: 2px;
+            background: rgba(188, 19, 254, 0.1);
+            position: fixed; top: 0; left: 0;
+            z-index: 10; pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <h1>Sacrifice Selection</h1>
+    
+    <div class="movie-grid" id="movie-container">
+        <!-- Сюда бот будет подгружать фильмы через JS -->
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на всё окно
+
+        // Тестовые данные (потом заменим на fetch к твоему серверу)
+        const movies = [
+            {id: 1, title: "Tetsuo: Iron Man", img: "https://via.placeholder.com"},
+            {id: 2, title: "Begotten", img: "https://via.placeholder.com"}
+        ];
+
+        const container = document.getElementById('movie-container');
+
+        movies.forEach(movie => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${movie.img}" class="poster">
+                <div class="title">${movie.title}</div>
+                <button class="btn-fav" onclick="addToFav(${movie.id})">SACRIFICE</button>
+            `;
+            container.appendChild(card);
+        });
+
+        function addToFav(id) {
+            tg.sendData(JSON.stringify({action: "add_fav", movie_id: id}));
+            tg.close(); // Закрываем после выбора
+        }
+    </script>
+</body>
+</html>
