@@ -19,20 +19,14 @@
         input { flex: 1; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.9rem; border-radius: 4px; }
         .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.65rem; border-radius: 4px; transition: 0.2s; }
         .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
-        
-        /* КОМПАКТНАЯ СЕТКА */
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; }
-        
         .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; }
         .card.is-top { border: 1px solid var(--cyber-yellow); }
         .poster-container { position: relative; width: 100%; padding-top: 150%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .poster[src*="placeholder"] { opacity: 0.3; filter: grayscale(1); }
-        
         .info { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
         .title { color: var(--neon-blue); font-size: 0.75rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; }
         .genre-tag { font-size: 0.6rem; color: #888; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 6px; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; text-transform: uppercase; border-radius: 3px; }
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
     </style>
@@ -46,7 +40,6 @@
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
         </div>
     </header>
-
     <div class="movie-grid" id="container"></div>
 
     <script>
@@ -77,26 +70,19 @@
         function render(movies) {
             const container = document.getElementById('container');
             container.innerHTML = '';
-            
             movies.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'card' + (m.is_top ? ' is-top' : '');
-                
-                // Защита постера: если ссылки нет, ставим стильный текст
-                var posterImg = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com...';
-
+                var posterImg = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
                 card.innerHTML = `
-                    <div class="poster-container">
-                        <img class="poster" src="${posterImg}" loading="lazy">
-                    </div>
+                    <div class="poster-container"><img class="poster" src="${posterImg}" loading="lazy"></div>
                     <div class="info">
                         <div>
                             <div class="title">${m.title || 'UNTITLED'}</div>
                             <div class="genre-tag">${m.genre || 'Various Genres'}</div>
                         </div>
                         <button class="sacrifice-btn" onclick="selectMovie(${m.id})">SACRIFICE</button>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(card);
             });
         }
@@ -119,8 +105,25 @@
             filterMovies();
         }
 
-        function selectMovie(id) {
-            if (tg) {
+        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ПОВТОРНЫХ НАЖАТИЙ ---
+        async function selectMovie(id) {
+            if (!tg) return;
+            const userId = tg.initDataUnsafe?.user?.id;
+            
+            if (userId) {
+                try {
+                    document.getElementById('stats').innerText = "SENDING TO BOT...";
+                    var p = 'https' + '://';
+                    var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                    var url = p + d + 'select?id=' + id + '&user_id=' + userId;
+                    
+                    await fetch(url);
+                    tg.close(); 
+                } catch (e) {
+                    tg.sendData(JSON.stringify({action: "select", id: id}));
+                    tg.close();
+                }
+            } else {
                 tg.sendData(JSON.stringify({action: "select", id: id}));
                 tg.close();
             }
