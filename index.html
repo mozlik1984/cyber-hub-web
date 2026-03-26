@@ -1,155 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CULT CINEMA HUB v9.0</title>
-    <script>
-        // ЗАЩИЩЕННАЯ СКЛЕЙКА СКРИПТА TELEGRAM
-        var s = document.createElement('script');
-        var p = 'https' + '://'; var d = 'telegram.org/js/'; var f = 'telegram-web-app.js';
-        s.src = p + d + f;
-        document.head.appendChild(s);
-    </script>
+    <title>CULT HUB v8.0</title>
+    <script src="https://telegram.org"></script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-        :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow: hidden; }
-        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-        .search-container { display: flex; gap: 8px; margin-top: 10px; }
-        input { flex: 1; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; border-radius: 4px; font-family: 'Rajdhani'; font-size: 0.9rem; }
-        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.65rem; border-radius: 4px; }
-        .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
+        :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #0d0d0d; }
+        body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 10px; overflow-x: hidden; }
         
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; height: calc(100vh - 120px); overflow-y: auto; }
-        .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: 0.3s; }
-        .poster-container { position: relative; width: 100%; padding-top: 150%; background: #1a1a1a; cursor: pointer; }
-        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .sac-badge { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: var(--cyber-yellow); border: 1px solid var(--cyber-yellow); font-family: 'Orbitron'; }
-        
-        .info { padding: 8px; flex-grow: 1; }
-        .title { color: var(--neon-blue); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; height: 2.2em; overflow: hidden; line-height: 1.1; }
-        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 6px; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; border-radius: 3px; margin-top: 5px; text-transform: uppercase; }
+        header { position: sticky; top: 0; background: rgba(13, 13, 13, 0.9); padding: 10px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(5px); }
+        h1 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; color: var(--cyber-yellow); font-size: 1rem; margin: 0; }
 
-        /* KINOZAL OVERLAY */
-        #videoOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        .video-container { width: 95%; max-width: 800px; aspect-ratio: 16/9; background: #000; border: 1px solid var(--neon-purple); box-shadow: 0 0 30px rgba(188, 19, 254, 0.3); }
-        .video-controls { margin-top: 25px; display: flex; gap: 15px; width: 95%; max-width: 800px; }
-        .v-btn { flex: 1; padding: 12px; font-family: 'Orbitron'; font-size: 0.7rem; border-radius: 5px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn-close { background: #1a1a1a; border: 1px solid #444; color: #aaa; }
-        .btn-select { background: var(--cyber-yellow); border: none; color: #000; box-shadow: 0 0 20px var(--cyber-yellow); font-weight: bold; }
+        /* ИСПРАВЛЕНО: Сетка 3 в ряд */
+        .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 4px; padding: 5px; display: flex; flex-direction: column; position: relative; }
+        .poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 2px; background: #1a1a1a; cursor: pointer; }
+        .title { margin: 5px 0; font-weight: 700; font-size: 0.6rem; color: var(--neon-blue); text-transform: uppercase; height: 2.4em; overflow: hidden; line-height: 1.2; font-family: 'Orbitron'; }
+        
+        .btn-sac { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.45rem; text-transform: uppercase; border-radius: 2px; }
+
+        /* ВСТРОЕННЫЙ ПЛЕЕР (Оверлей) */
+        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        .video-cont { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        .close-btn { margin-top: 20px; background: var(--cyber-yellow); color: #000; border: none; padding: 8px 20px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
+
+        .scanline { width: 100%; height: 2px; background: rgba(188, 19, 254, 0.1); position: fixed; top: 0; left: 0; z-index: 10; pointer-events: none; animation: scan 4s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
     </style>
 </head>
 <body>
+    <div class="scanline"></div>
+    
+    <!-- СЛОЙ ПЛЕЕРА -->
+    <div id="video-layer">
+        <div class="video-cont" id="player-box"></div>
+        <button class="close-btn" onclick="closeVideo()">BACK TO ARCHIVE</button>
+    </div>
+
     <header>
-        <div id="stats" style="font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px;">HUB STATUS: SYNCING...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 2px;">THE VOID ARCHIVE</div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="SEARCH ARCHIVE..." oninput="filterMovies()">
-            <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
-        </div>
+        <h1>Sacrifice Selection <span style="font-size: 0.6rem; opacity: 0.5;">v8.0</span></h1>
     </header>
-
-    <div class="movie-grid" id="container"></div>
-
-    <div id="videoOverlay">
-        <div class="video-container" id="player"></div>
-        <div class="video-controls">
-            <button class="v-btn btn-close" onclick="closePlayer()">BACK TO HUB</button>
-            <button class="v-btn btn-select" id="selectBtn">SACRIFICE NOW</button>
+    
+    <div class="movie-grid" id="movie-container">
+        <div style="grid-column: 1/4; text-align: center; color: var(--neon-purple); font-size: 0.8rem; margin-top: 50px;">
+            SCANNING THE VOID...
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        if(tg) { tg.ready(); tg.expand(); }
+        if(tg) { tg.expand(); tg.ready(); }
 
-        let allMovies = [];
-        let showOnlyTop = false;
-
+        // ЗАГРУЗКА ДАННЫХ
         async function load() {
-            const stats = document.getElementById('stats');
             try {
-                // ЗАЩИЩЕННАЯ СКЛЕЙКА API
+                // Склейка URL для обхода кэша и защиты
                 var p = 'https' + '://'; 
                 var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var u = p + d + '?v=' + new Date().getTime();
                 
                 const response = await fetch(u);
-                allMovies = await response.json();
-                stats.innerText = 'ONLINE | ' + allMovies.length + ' MASTERPIECES';
-                render(allMovies);
-            } catch (e) { stats.innerText = 'OFFLINE'; }
+                const movies = await response.json();
+                render(movies);
+            } catch (err) {
+                document.getElementById('movie-container').innerHTML = 
+                    '<div style="color:red; grid-column:1/4; text-align:center;">CONNECTION LOST</div>';
+            }
         }
 
         function render(movies) {
-            const container = document.getElementById('container');
-            container.innerHTML = '';
+            const container = document.getElementById('movie-container');
+            container.innerHTML = ''; 
+
             movies.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                // Защита постера
-                var img = m.img && m.img.includes('http') ? m.img : 'https' + '://' + '://via.placeholder.com';
-                
+                // Клик по постеру открывает плеер, кнопка - карточку в боте
                 card.innerHTML = `
-                    <div class="poster-container">
-                        <img class="poster" src="${img}" onclick="openPlayer('${m.t_id}', ${m.id})">
-                        <div class="sac-badge">💀 ${m.sacrifices || 0}</div>
-                    </div>
-                    <div class="info">
-                        <div class="title">${m.title}</div>
-                        <button class="sacrifice-btn" onclick="openPlayer('${m.t_id}', ${m.id})">VIEW RITUAL</button>
-                    </div>`;
+                    <img src="${m.img}" class="poster" onclick="play('${m.t_id}')" onerror="this.src='https://via.placeholder.com'">
+                    <div class="title">${m.title}</div>
+                    <button class="btn-sac" onclick="sacrifice('${m.id}')">SACRIFICE</button>
+                `;
                 container.appendChild(card);
             });
         }
 
-        function openPlayer(ytId, movieId) {
-            const overlay = document.getElementById('videoOverlay');
-            const playerDiv = document.getElementById('player');
-            overlay.style.display = 'flex';
-            
-            // ЗАЩИЩЕННАЯ СКЛЕЙКА YOUTUBE EMBED
-            var y_p = 'https' + '://' + 'www.youtube.com' + '/';
-            var y_u = y_p + 'embed' + '/' + ytId + '?autoplay=1&rel=0';
-            
-            playerDiv.innerHTML = '<iframe width="100%" height="100%" src="' + y_u + '" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-            
-            document.getElementById('selectBtn').onclick = () => selectMovie(movieId);
+        // ВНУТРЕННИЙ ПЛЕЕР (Решает проблему ошибки YouTube)
+        function play(tid) {
+            if (!tid || tid === "None" || tid.length < 5) {
+                tg.showAlert("NO DIRECT LINK. USE THE BOT CARD.");
+                return;
+            }
+            const box = document.getElementById('player-box');
+            // Используем формат /embed/ для корректной работы внутри WebApp
+            box.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com{tid}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            document.getElementById('video-layer').style.display = 'flex';
         }
 
-        function closePlayer() {
-            document.getElementById('videoOverlay').style.display = 'none';
-            document.getElementById('player').innerHTML = '';
+        function closeVideo() {
+            document.getElementById('player-box').innerHTML = '';
+            document.getElementById('video-layer').style.display = 'none';
         }
 
-        async function selectMovie(id) {
+        // ОТПРАВКА В БОТ
+        function sacrifice(id) {
             const uid = tg.initDataUnsafe?.user?.id;
+            var p = 'https' + '://'; 
+            var d = 'metal-art-mozlik1984.amvera.io' + '/';
+            
             if (uid) {
-                // ЗАЩИЩЕННАЯ СКЛЕЙКА SELECT ЗАПРОСА
-                var p = 'https' + '://'; 
-                var d = 'metal-art-mozlik1984.amvera.io' + '/';
-                var u = p + d + 'select?id=' + id + '&user_id=' + uid;
-                
-                await fetch(u);
+                // Пытаемся вызвать карточку через API
+                fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
                 tg.close();
             } else {
-                tg.sendData(JSON.stringify({action:"select", id:id}));
+                tg.sendData(JSON.stringify({action: "sac", id: id}));
                 tg.close();
             }
-        }
-
-        function filterMovies() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            let f = allMovies.filter(m => (m.title + m.director + m.genre).toLowerCase().includes(q));
-            if (showOnlyTop) f = f.filter(m => m.is_top === 1);
-            render(f);
-        }
-
-        function toggleTopFilter() {
-            showOnlyTop = !showOnlyTop;
-            document.getElementById('topFilter').classList.toggle('active');
-            filterMovies();
         }
 
         load();
