@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SACRIFICE HUB</title>
-    <!-- ЗАЩИТА: Склеиваем библиотеку Telegram -->
+    <title>SACRIFICE HUB v5.2</title>
     <script>
         var script = document.createElement('script');
         var p1 = 'https://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
@@ -15,29 +14,35 @@
     <style>
         :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
         body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 15px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-        .search-container { display: flex; gap: 10px; margin-top: 10px; }
-        input { flex: 1; background: #1a1a1a; border: 1px solid var(--neon-blue); padding: 10px; color: #fff; outline: none; font-family: 'Rajdhani'; }
-        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 15px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; }
-        .filter-btn.active { background: var(--cyber-yellow); color: #000; }
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 20px; }
-        .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 5px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; }
-        .card.is-top { border: 1px solid var(--cyber-yellow); box-shadow: 0 0 10px rgba(248, 239, 0, 0.2); }
-        .poster-container { position: relative; width: 100%; padding-top: 150%; background: #111; }
-        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .title { color: var(--neon-blue); font-size: 0.85rem; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
-        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
-        #stats { font-size: 0.65rem; color: var(--neon-purple); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .error-msg { grid-column: 1/-1; text-align: center; color: #ff0055; padding: 40px 20px; font-family: 'Orbitron'; font-size: 0.8rem; }
+        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
+        .search-container { display: flex; gap: 8px; margin-top: 10px; }
+        input { flex: 1; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.9rem; border-radius: 4px; }
+        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.65rem; border-radius: 4px; transition: 0.2s; }
+        .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
+        
+        /* КОМПАКТНАЯ СЕТКА */
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; }
+        
+        .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; }
+        .card.is-top { border: 1px solid var(--cyber-yellow); }
+        .poster-container { position: relative; width: 100%; padding-top: 150%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
+        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .poster[src*="placeholder"] { opacity: 0.3; filter: grayscale(1); }
+        
+        .info { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
+        .title { color: var(--neon-blue); font-size: 0.75rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; }
+        .genre-tag { font-size: 0.6rem; color: #888; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 6px; font-family: 'Orbitron'; font-size: 0.55rem; cursor: pointer; text-transform: uppercase; border-radius: 3px; }
+        #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
     <header>
-        <div id="stats">HUB STATUS: INITIALIZING SYSTEM...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1.1rem; letter-spacing: 2px;">SACRIFICE HUB</div>
+        <div id="stats">HUB STATUS: INITIALIZING...</div>
+        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">SACRIFICE HUB <span style="font-size: 0.6rem; opacity: 0.6;">v5.2</span></div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="SEARCH SECTOR..." oninput="filterMovies()">
+            <input type="text" id="searchInput" placeholder="TITLE, DIRECTOR OR GENRE..." oninput="filterMovies()">
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
         </div>
     </header>
@@ -45,44 +50,27 @@
     <div class="movie-grid" id="container"></div>
 
     <script>
-        // Ждем, пока загрузится библиотека Telegram
-        setTimeout(() => {
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-            }
-        }, 500);
+        let tg = window.Telegram.WebApp;
+        setTimeout(() => { if(tg) { tg.ready(); tg.expand(); } }, 500);
 
         let allMovies = [];
         let showOnlyTop = false;
 
         async function load() {
             const stats = document.getElementById('stats');
-            const container = document.getElementById('container');
-            
             try {
-                stats.innerText = "HUB STATUS: ESTABLISHING CONNECTION...";
-                
-                // ЗАЩИТА: Склеиваем адрес API Amvera
+                stats.innerText = "HUB STATUS: SYNCING DATA...";
                 var protocol = 'https' + '://';
                 var domain = 'metal-art-mozlik1984.amvera.io' + '/';
                 var apiUrl = protocol + domain + '?v=' + new Date().getTime();
                 
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                if (!response.ok) throw new Error('HTTP_' + response.status);
-
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('ERR_' + response.status);
                 allMovies = await response.json();
                 stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' MOVIES';
                 render(allMovies);
-
             } catch (e) {
-                console.error(e);
                 stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']';
-                container.innerHTML = '<div class="error-msg">SYSTEM FAILURE: ' + e.message + '</div>';
             }
         }
 
@@ -94,16 +82,18 @@
                 const card = document.createElement('div');
                 card.className = 'card' + (m.is_top ? ' is-top' : '');
                 
-                // Склеиваем адрес заглушки, чтобы не обрезало
-                var ph = 'https' + '://' + '://via.placeholder.com';
-                var posterImg = m.img && m.img.includes('http') ? m.img : ph;
+                // Защита постера: если ссылки нет, ставим стильный текст
+                var posterImg = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com...';
 
                 card.innerHTML = `
                     <div class="poster-container">
                         <img class="poster" src="${posterImg}" loading="lazy">
                     </div>
                     <div class="info">
-                        <div class="title">${(m.title || 'UNTITLED').toUpperCase()}</div>
+                        <div>
+                            <div class="title">${m.title || 'UNTITLED'}</div>
+                            <div class="genre-tag">${m.genre || 'Various Genres'}</div>
+                        </div>
                         <button class="sacrifice-btn" onclick="selectMovie(${m.id})">SACRIFICE</button>
                     </div>
                 `;
@@ -114,9 +104,10 @@
         function filterMovies() {
             const q = document.getElementById('searchInput').value.toLowerCase().trim();
             let filtered = allMovies.filter(m => {
-                const titleStr = String(m.title || '').toLowerCase();
-                const directorStr = String(m.director || '').toLowerCase();
-                return titleStr.includes(q) || directorStr.includes(q);
+                const t = String(m.title || '').toLowerCase();
+                const d = String(m.director || '').toLowerCase();
+                const g = String(m.genre || '').toLowerCase();
+                return t.includes(q) || d.includes(q) || g.includes(q);
             });
             if (showOnlyTop) filtered = filtered.filter(m => m.is_top === 1);
             render(filtered);
@@ -129,9 +120,9 @@
         }
 
         function selectMovie(id) {
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.sendData(JSON.stringify({action: "select", id: id}));
-                window.Telegram.WebApp.close();
+            if (tg) {
+                tg.sendData(JSON.stringify({action: "select", id: id}));
+                tg.close();
             }
         }
 
