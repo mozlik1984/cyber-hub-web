@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SACRIFICE HUB v5.2</title>
+    <title>SACRIFICE HUB v6.0</title>
     <script>
         var script = document.createElement('script');
         var p1 = 'https://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
@@ -34,7 +34,7 @@
 <body>
     <header>
         <div id="stats">HUB STATUS: INITIALIZING...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">SACRIFICE HUB <span style="font-size: 0.6rem; opacity: 0.6;">v5.2</span></div>
+        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">SACRIFICE HUB <span style="font-size: 0.6rem; opacity: 0.6;">v6.0</span></div>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="TITLE, DIRECTOR OR GENRE..." oninput="filterMovies()">
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
@@ -53,18 +53,13 @@
             const stats = document.getElementById('stats');
             try {
                 stats.innerText = "HUB STATUS: SYNCING DATA...";
-                var protocol = 'https' + '://';
-                var domain = 'metal-art-mozlik1984.amvera.io' + '/';
-                var apiUrl = protocol + domain + '?v=' + new Date().getTime();
-                
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var apiUrl = p + d + '?v=' + new Date().getTime();
                 const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('ERR_' + response.status);
                 allMovies = await response.json();
                 stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' MOVIES';
                 render(allMovies);
-            } catch (e) {
-                stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']';
-            }
+            } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
         }
 
         function render(movies) {
@@ -73,14 +68,15 @@
             movies.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'card' + (m.is_top ? ' is-top' : '');
-                var posterImg = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
+                const sc = m.sacrifices || 0;
+                var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
                 card.innerHTML = `
-                    <div class="poster-container"><img class="poster" src="${posterImg}" loading="lazy"></div>
+                    <div class="poster-container">
+                        <img class="poster" src="${img}" loading="lazy">
+                        <div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.6rem; color:#f8ef00; border:1px solid #f8ef00; font-family:'Orbitron';">💀 ${sc}</div>
+                    </div>
                     <div class="info">
-                        <div>
-                            <div class="title">${m.title || 'UNTITLED'}</div>
-                            <div class="genre-tag">${m.genre || 'Various Genres'}</div>
-                        </div>
+                        <div><div class="title">${m.title || 'UNTITLED'}</div><div class="genre-tag">${m.genre || 'Various Genres'}</div></div>
                         <button class="sacrifice-btn" onclick="selectMovie(${m.id})">SACRIFICE</button>
                     </div>`;
                 container.appendChild(card);
@@ -90,10 +86,7 @@
         function filterMovies() {
             const q = document.getElementById('searchInput').value.toLowerCase().trim();
             let filtered = allMovies.filter(m => {
-                const t = String(m.title || '').toLowerCase();
-                const d = String(m.director || '').toLowerCase();
-                const g = String(m.genre || '').toLowerCase();
-                return t.includes(q) || d.includes(q) || g.includes(q);
+                return String(m.title+m.director+m.genre).toLowerCase().includes(q);
             });
             if (showOnlyTop) filtered = filtered.filter(m => m.is_top === 1);
             render(filtered);
@@ -105,30 +98,18 @@
             filterMovies();
         }
 
-        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ПОВТОРНЫХ НАЖАТИЙ ---
         async function selectMovie(id) {
             if (!tg) return;
-            const userId = tg.initDataUnsafe?.user?.id;
-            
-            if (userId) {
+            const uid = tg.initDataUnsafe?.user?.id;
+            if (uid) {
                 try {
                     document.getElementById('stats').innerText = "SENDING TO BOT...";
-                    var p = 'https' + '://';
-                    var d = 'metal-art-mozlik1984.amvera.io' + '/';
-                    var url = p + d + 'select?id=' + id + '&user_id=' + userId;
-                    
-                    await fetch(url);
+                    var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                    await fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
                     tg.close(); 
-                } catch (e) {
-                    tg.sendData(JSON.stringify({action: "select", id: id}));
-                    tg.close();
-                }
-            } else {
-                tg.sendData(JSON.stringify({action: "select", id: id}));
-                tg.close();
-            }
+                } catch (e) { tg.sendData(JSON.stringify({action:"select",id:id})); tg.close(); }
+            } else { tg.sendData(JSON.stringify({action:"select",id:id})); tg.close(); }
         }
-
         load();
     </script>
 </body>
