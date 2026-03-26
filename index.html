@@ -1,147 +1,212 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CULT HUB v8.0</title>
-    <script>
-        var script = document.createElement('script');
-        var p1 = 'https://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
-        script.src = p1 + p2 + p3;
-        document.head.appendChild(script);
-    </script>
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
-    <style>
-        :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-        .search-container { display: flex; gap: 8px; margin-top: 10px; }
-        input { flex: 1; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
-        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.6rem; border-radius: 4px; transition: 0.2s; }
-        .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
-        .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
-        .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; }
-        .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
-        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
-        .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
-        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
-        #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
+import sqlite3, os, asyncio, html, urllib.parse, aiohttp, re, json
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+from aiogram.types import WebAppInfo, FSInputFile, CallbackQuery
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
-        /* ПЛЕЕР */
-        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .video-wrapper { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
-        .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
-    </style>
-</head>
-<body>
-    <!-- Слой плеера -->
-    <div id="video-layer">
-        <div class="video-wrapper" id="player-container"></div>
-        <button class="close-player-btn" onclick="closeVideo()">BACK TO HUB</button>
-    </div>
+load_dotenv()
 
-    <header>
-        <div id="stats">HUB STATUS: INITIALIZING...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.0</span></div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="TITLE, DIRECTOR..." oninput="filterMovies()">
-            <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
-        </div>
-    </header>
+S = chr(47); C = chr(58); Q = chr(63); E = chr(61); A = chr(38); P = "https" + C + S + S
+TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = 5002053185
+DB_PATH = S + "data" + S + "cinema.db"
+BOT_USERNAME = "MetalArtTest_bot"
+USDT_WALLET = "TSwsk8AFDJK2LAQcEJMdbGmGCF835ZgmUW"
+RUB_CARD = "4817760335549477"
+ADMIN_CONTACT = "@Plokhomentov"
+WEB_HUB_URL = P + "mozlik1984.github.io" + S + "cyber-hub-web" + S 
 
-    <div class="movie-grid" id="container"></div>
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+app = FastAPI()
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        setTimeout(() => { if(tg) { tg.ready(); tg.expand(); } }, 500);
+@app.get(S)
+async def get_api():
+    conn = sqlite3.connect(DB_PATH); conn.row_factory = sqlite3.Row
+    res = conn.execute("SELECT id, name as title, genre, director, trailer, poster_url as img, is_top, sacrifices FROM movies ORDER BY sacrifices DESC, name ASC").fetchall()
+    conn.close()
+    output = []
+    for r in res:
+                d['t_id'] = get_yt_id(d['trailer'])
+        # ДОБАВЛЯЕМ: Название для поиска в плеере, если ID заблокирован
+        d['q'] = urllib.parse.quote(d['title'] + " trailer")
+        output.append(d)
+    return output
 
-        let allMovies = [];
-        let showOnlyTop = false;
+@app.get(S + "select")
+async def api_select(id: int, user_id: int):
+    conn = sqlite3.connect(DB_PATH); conn.row_factory = sqlite3.Row
+    res = conn.execute("SELECT * FROM movies WHERE id = ?", (id,)).fetchone()
+    conn.close()
+    if res: asyncio.create_task(send_card(None, res, manual_cid=user_id))
+    return {"status": "ok"}
 
-        async function load() {
-            const stats = document.getElementById('stats');
-            try {
-                stats.innerText = "HUB STATUS: SYNCING DATA...";
-                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-                var apiUrl = p + d + '?v=' + new Date().getTime();
-                const response = await fetch(apiUrl);
-                allMovies = await response.json();
-                stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
-                render(allMovies);
-            } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
-        }
+# УПРОЩЕННЫЙ ПАРСЕР БЕЗ РИКРОЛЛА
+def get_yt_id(u):
+    u = str(u)
+    if len(u) == 11 and S not in u: return u
+    try:
+        if "v" + E in u: return u.split("v" + E)[1].split(A)[0][:11]
+        if "be" + S in u: return u.split("be" + S)[1].split(Q)[0][:11]
+    except: pass
+    return None
 
-        function render(movies) {
-            const container = document.getElementById('container');
-            container.innerHTML = '';
-            movies.forEach(m => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                if (m.is_top) card.classList.add('is-top');
-                const sc = m.sacrifices || 0;
-                var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
+def init_db():
+    d = S + "data"; os.makedirs(d, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH); c = conn.cursor()
+    c.execute("CREATE TABLE IF NOT EXISTS movies (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, genre TEXT, director TEXT, trailer TEXT, is_top INTEGER DEFAULT 0, poster_url TEXT, sacrifices INTEGER DEFAULT 0)")
+    c.execute("CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY)")
+    c.execute("CREATE TABLE IF NOT EXISTS votes (user_id INTEGER, movie_id INTEGER, PRIMARY KEY(user_id, movie_id))")
+    try: c.execute("ALTER TABLE movies ADD COLUMN sacrifices INTEGER DEFAULT 0")
+    except: pass
+    conn.commit(); conn.close()
+
+async def get_poster(n, t):
+    try:
+        q = urllib.parse.quote(n + " movie poster high res")
+        url = P + "www.bing.com" + S + "images" + S + "search" + Q + "q" + E + q
+        async with aiohttp.ClientSession(headers={'User-Agent':'Mozilla/5.0'}) as s:
+            async with s.get(url, timeout=5) as r:
+                if r.status == 200:
+                    m = re.findall(r'murl&quot;:&quot;(http.*?)&quot;', await r.text())
+                    if m: return m[0]
+    except: pass
+    # Если постера нет, берем превью из YouTube по ID
+    return P + "img.youtube.com" + S + "vi" + S + (get_yt_id(t) or "dQw4w9WgXcQ") + S + "maxresdefault.jpg"
+
+async def send_card(m, r, is_cb=False, manual_cid=None):
+    cid = manual_cid if manual_cid else (m.message.chat.id if is_cb else m.chat.id)
+    try:
+        d_id, name, genre, dr_raw, trailer, top, poster = r['id'], r['name'], r['genre'], r['director'], r['trailer'], r['is_top'], r['poster_url']
+        y = ""; dr = str(dr_raw)
+        ym = re.search(r'\((19|20)\d{2}\)', dr)
+        if ym: y = ym.group(0); dr = dr.replace(y, "").strip()
+        
+        # ПОЛУЧАЕМ ID (если он есть в базе)
+        tid = get_yt_id(trailer)
+        
+        # ЛОГИКА ССЫЛКИ: Если ID есть — прямая ссылка, если нет — поиск в YouTube
+        if tid:
+            tr = P + "www.youtube.com" + S + "watch" + Q + "v" + E + tid
+        else:
+            q_yt = urllib.parse.quote(name + " " + dr + " trailer")
+            tr = P + "www.youtube.com" + S + "results" + Q + "search_query" + E + q_yt
+            
+        go = P + "www.google.com" + S + "search" + Q + "q" + E + urllib.parse.quote(name + " " + y) + "+watch+online"
+        im = P + "www.imdb.com" + S + "find" + Q + "q" + E + urllib.parse.quote(name)
+        
+        ikb = InlineKeyboardBuilder()
+        ikb.row(types.InlineKeyboardButton(text="📺 TRAILER", url=tr), types.InlineKeyboardButton(text="🎬 WATCH", url=go))
+        ikb.row(types.InlineKeyboardButton(text="💀 SACRIFICE THIS", callback_data=f"sac_{d_id}"))
+        
+        tags = " ".join([f"#{re.sub(r'[^a-zA-Z0-9]', '', t)}" for t in str(genre).split(",") if t.strip()])
+        sac = r['sacrifices'] if 'sacrifices' in dict(r) else 0
+        cap = f"{'🏆 ' if top else ''}🎬 <b>{html.escape(name)} {y}</b>\n👤 {dr}\n⭐ <a href='{im}'>IMDb</a> | 💀 <b>ASCENSION: {sac}</b>\n\n🎭 {tags}"
+        
+        try: await bot.send_photo(cid, photo=poster or "https://via.placeholder.com", caption=cap, parse_mode="HTML", reply_markup=ikb.as_markup())
+        except: await bot.send_message(cid, text=cap, parse_mode="HTML", reply_markup=ikb.as_markup())
+    except Exception as e: await bot.send_message(cid, f"❌ Error: {str(e)}")
+
+@dp.callback_query(F.data.startswith("sac_"))
+async def handle_sacrifice(cb: CallbackQuery):
+    m_id = int(cb.data.split("_")[1])
+    u_id = cb.from_user.id
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        conn.execute("INSERT INTO votes (user_id, movie_id) VALUES (?, ?)", (u_id, m_id))
+        conn.execute("UPDATE movies SET sacrifices = IFNULL(sacrifices, 0) + 1 WHERE id = ?", (m_id,))
+        conn.commit()
+        await cb.answer("💀 Sacrifice accepted! Ritual complete.", show_alert=False)
+    except sqlite3.IntegrityError:
+        await cb.answer("❌ You have already sacrificed for this film.", show_alert=True)
+    finally: conn.close()
+
+CATEGORIES = ["🎬 OPEN SACRIFICE HUB", "🏆 CULT TOP 100", "🎲 SURPRISE ME", "📢 SPREAD THE CULT", "🔮 THE ORACLE / SUPPORT"]
+
+@dp.message(Command("start"))
+async def cmd_start(m: types.Message):
+    init_db()
+    conn = sqlite3.connect(DB_PATH); conn.execute("INSERT OR IGNORE INTO users VALUES (?)",(m.from_user.id,)); conn.commit(); conn.close()
+    kb = ReplyKeyboardBuilder()
+    for c in CATEGORIES:
+        if "SACRIFICE" in c: kb.button(text=c, web_app=WebAppInfo(url=WEB_HUB_URL))
+        else: kb.button(text=c)
+    await m.answer("🍿 <b>CULT CINEMA HUB</b>\n<i>The Archive of the Void.</i>", reply_markup=kb.adjust(1, 2, 2).as_markup(resize_keyboard=True), parse_mode="HTML")
+
+@dp.message(F.text.in_(CATEGORIES))
+async def menu_logic(m: types.Message):
+    t = m.text
+    if "SPREAD" in t:
+        u = P + "t.me" + S + "share" + S + "url" + Q + "url" + E + P + "t.me" + S + BOT_USERNAME
+        await m.answer("📲 <b>SPREAD THE CULT!</b>", reply_markup=InlineKeyboardBuilder().row(types.InlineKeyboardButton(text="SHARE HUB", url=u)).as_markup(), parse_mode="HTML")
+    elif "ORACLE" in t:
+        st = f"🔮 <b>THE ORACLE / VOID PROTOCOL</b>\n\nWelcome to the epicenter. Our Hub is a living altar of digital cinema, fueled by your collective will.\n\n💀 <b>THE SACRIFICE RITUAL:</b>\nEvery film you sacrifice ascends within the Cult Hierarchy.\n\n📩 <b>Contact The Oracle:</b> {ADMIN_CONTACT}\n💳 <b>Fuel the Void:</b> <code>{RUB_CARD}</code>\n💎 <b>USDT:</b> <code>{USDT_WALLET}</code>\n\n<i>Your sacrifice matters. Expand the abyss.</i>"
+        await m.answer(st, parse_mode="HTML")
+    elif "TOP 100" in t or "SURPRISE" in t:
+        conn = sqlite3.connect(DB_PATH); conn.row_factory = sqlite3.Row
+        q = "WHERE is_top=1" if "TOP" in t else ""
+        r = conn.execute(f"SELECT * FROM movies {q} ORDER BY RANDOM() LIMIT 1").fetchone(); conn.close()
+        if r: await send_card(m, r)
+
+@dp.message(Command("stats"), F.from_user.id == ADMIN_ID)
+async def get_stats(m: types.Message):
+    conn = sqlite3.connect(DB_PATH)
+    u = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    mc = conn.execute("SELECT COUNT(*) FROM movies").fetchone()[0]; conn.close()
+    await m.answer(f"📊 <b>HUB STATS</b>\n\nUsers: {u}\nMovies: {mc}")
+
+# ИСПРАВЛЕННЫЙ SMART SYNC: РАБОТАЕТ СО СТРОКАМИ И ОЧИЩАЕТ ID
+@dp.message(F.document, F.from_user.id == ADMIN_ID)
+async def smart_sync(m: types.Message):
+    try:
+        f = await bot.get_file(m.document.file_id); c = await bot.download_file(f.file_path)
+        bl = c.read().decode('utf-8').split("---")
+        conn = sqlite3.connect(DB_PATH); a, u = 0, 0
+        for b in bl:
+            # Разрезаем блок на отдельные строки
+            lines = [i.strip() for i in b.splitlines() if i.strip()]
+            if len(lines) >= 4:
+                nm = lines[0] # Название фильма
+                gn = lines[1] # Жанр
+                dr = lines[2] # Режиссер
+                tr_raw = lines[3] # Ссылка/ID с пометкой TOP
                 
-                card.innerHTML = `
-                    <div class="poster-container" onclick="openVideo('${m.t_id}')">
-                        <img class="poster" src="${img}" loading="lazy">
-                        <div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:'Orbitron';">💀 ${sc}</div>
-                    </div>
-                    <div class="info">
-                        <div><div class="title">${m.title || 'UNTITLED'}</div></div>
-                        <button class="sacrifice-btn" onclick="selectMovie(${m.id})">VIEW CARD</button>
-                    </div>`;
-                container.appendChild(card);
-            });
-        }
+                # Извлекаем статус TOP и чистим ID трейлера
+                is_t = 1 if "TOP" in tr_raw.upper() else 0
+                tr = tr_raw.replace("TOP", "").strip()
+                
+                # Проверяем наличие в базе по имени
+                ex = conn.execute("SELECT id FROM movies WHERE LOWER(TRIM(name)) = ?", (nm.lower(),)).fetchone()
+                if ex: 
+                    # Обновляем существующий фильм (добавляем ID трейлера и статус TOP)
+                    conn.execute("UPDATE movies SET genre=?, director=?, trailer=?, is_top=? WHERE id=?", (gn, dr, tr, is_t, ex[0]))
+                    u += 1
+                else:
+                    # Создаем новый, если не найден
+                    conn.execute("INSERT INTO movies (name, genre, director, trailer, is_top) VALUES (?,?,?,?,?)",(nm, gn, dr, tr, is_t))
+                    a += 1
+        conn.commit(); conn.close(); await m.answer(f"✅ Sync complete: +{a} / ~{u}")
+    except Exception as e: await m.answer(f"❌ Error: {str(e)}")
 
-        function openVideo(tid) {
-            if (!tid || tid === "None" || tid.length < 5) {
-                tg.showAlert("NO DIRECT LINK. USE THE BOT CARD.");
-                return;
-            }
-            const layer = document.getElementById('video-layer');
-            const cont = document.getElementById('player-container');
-            cont.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com{tid}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            layer.style.display = 'flex';
-        }
+@dp.message(F.text)
+async def search_logic(m: types.Message):
+    if m.text.startswith(S) or m.text in CATEGORIES: return
+    conn = sqlite3.connect(DB_PATH); conn.row_factory = sqlite3.Row
+    tx = f"%{m.text.strip()}%"
+    res = conn.execute("SELECT * FROM movies WHERE name LIKE ? OR director LIKE ? OR genre LIKE ? LIMIT 3", (tx, tx, tx)).fetchall(); conn.close()
+    if res:
+        for r in res: await send_card(m, r)
+    else: await m.answer("🔍 Nothing found.")
 
-        function closeVideo() {
-            document.getElementById('player-container').innerHTML = '';
-            document.getElementById('video-layer').style.display = 'none';
-        }
+async def main():
+    init_db()
+    u_s = uvicorn.Server(uvicorn.Config(app, host="0.0.0.0", port=80, loop="asyncio"))
+    await asyncio.gather(dp.start_polling(bot), u_s.serve())
 
-        function filterMovies() {
-            const q = document.getElementById('searchInput').value.toLowerCase().trim();
-            let filtered = allMovies.filter(m => String(m.title+m.director+m.genre).toLowerCase().includes(q));
-            if (showOnlyTop) filtered = filtered.filter(m => m.is_top === 1);
-            render(filtered);
-        }
-
-        function toggleTopFilter() {
-            showOnlyTop = !showOnlyTop;
-            document.getElementById('topFilter').classList.toggle('active');
-            filterMovies();
-        }
-
-        async function selectMovie(id) {
-            if (!tg) return;
-            const uid = tg.initDataUnsafe?.user?.id;
-            var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-            if (uid) {
-                try {
-                    await fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
-                    tg.close(); 
-                } catch (e) { 
-                    tg.sendData(JSON.stringify({action:"select",id:id})); 
-                    tg.close(); 
-                }
-            } else {
-                tg.sendData(JSON.stringify({action:"select",id:id}));
-                tg.close();
-            }
-        }
-        load();
-    </script>
-</body>
-</html>
+if __name__ == "__main__":
+    asyncio.run(main())
