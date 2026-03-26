@@ -77,7 +77,7 @@
                     </div>
                     <div class="info">
                         <div><div class="title">${m.title || 'UNTITLED'}</div><div class="genre-tag">${m.genre || 'Various Genres'}</div></div>
-                        <button class="sacrifice-btn" onclick="selectMovie(${m.id})">SACRIFICE</button>
+                        <button class="sacrifice-btn" onclick="selectMovie(${m.id})">VIEW CARD</button>
                     </div>`;
                 container.appendChild(card);
             });
@@ -98,17 +98,26 @@
             filterMovies();
         }
 
+        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ: ТЕПЕРЬ ТОЛЬКО ОТКРЫВАЕТ КАРТОЧКУ ---
         async function selectMovie(id) {
             if (!tg) return;
             const uid = tg.initDataUnsafe?.user?.id;
+            
+            // Мы просто уведомляем бэкенд, что надо прислать карточку юзеру
+            // Логика "Черепа" теперь сработает только в самом боте!
             if (uid) {
                 try {
-                    document.getElementById('stats').innerText = "SENDING TO BOT...";
                     var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                     await fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
                     tg.close(); 
-                } catch (e) { tg.sendData(JSON.stringify({action:"select",id:id})); tg.close(); }
-            } else { tg.sendData(JSON.stringify({action:"select",id:id})); tg.close(); }
+                } catch (e) { 
+                    tg.sendData(JSON.stringify({action:"select",id:id})); 
+                    tg.close(); 
+                }
+            } else {
+                tg.sendData(JSON.stringify({action:"select",id:id}));
+                tg.close();
+            }
         }
         load();
     </script>
