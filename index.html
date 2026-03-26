@@ -7,255 +7,78 @@
     <script src="https://telegram.org"></script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-        :root {
-            --neon-purple: #bc13fe;
-            --neon-blue: #05d9e8;
-            --cyber-yellow: #f8ef00;
-            --bg-dark: #050505;
-            --card-bg: rgba(20, 20, 20, 0.9);
-        }
-
-        body {
-            background: var(--bg-dark);
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        header {
-            position: sticky;
-            top: 0;
-            background: rgba(5, 5, 5, 0.95);
-            padding: 15px;
-            z-index: 100;
-            border-bottom: 1px solid var(--neon-purple);
-            backdrop-filter: blur(10px);
-        }
-
-        .search-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        input {
-            flex: 1;
-            background: #1a1a1a;
-            border: 1px solid var(--neon-blue);
-            padding: 10px;
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
-            outline: none;
-        }
-
-        .filter-btn {
-            background: transparent;
-            border: 1px solid var(--cyber-yellow);
-            color: var(--cyber-yellow);
-            padding: 5px 15px;
-            cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-        }
-
-        .filter-btn.active {
-            background: var(--cyber-yellow);
-            color: #000;
-        }
-
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(188, 19, 254, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card.is-top {
-            border: 1px solid var(--cyber-yellow);
-            box-shadow: 0 0 10px rgba(248, 239, 0, 0.2);
-        }
-
-        .card:active { transform: scale(0.98); }
-
-        .poster-container {
-            position: relative;
-            width: 100%;
-            padding-top: 150%;
-        }
-
-        .poster {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover;
-        }
-
-        .top-badge {
-            position: absolute;
-            top: 5px; right: 5px;
-            background: var(--cyber-yellow);
-            color: #000;
-            padding: 2px 5px;
-            font-size: 0.6rem;
-            font-weight: bold;
-            border-radius: 3px;
-            z-index: 10;
-        }
-
-        .info {
-            padding: 10px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .title {
-            color: var(--neon-blue);
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            line-height: 1.1;
-        }
-
-        .director {
-            font-size: 0.7rem;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-
-        .sacrifice-btn {
-            width: 100%;
-            background: linear-gradient(45deg, var(--neon-purple), #8a2be2);
-            border: none;
-            color: #fff;
-            padding: 8px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.6rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .scanline {
-            width: 100%; height: 2px;
-            background: rgba(188, 19, 254, 0.1);
-            position: fixed; top: 0; left: 0;
-            z-index: 200; pointer-events: none;
-            animation: scan 4s linear infinite;
-        }
-
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        #stats {
-            font-size: 0.7rem;
-            color: var(--neon-purple);
-            margin-bottom: 5px;
-            word-break: break-all;
-        }
+        :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
+        body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 15px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
+        .search-container { display: flex; gap: 10px; margin-top: 10px; }
+        input { flex: 1; background: #1a1a1a; border: 1px solid var(--neon-blue); padding: 10px; color: #fff; outline: none; }
+        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 15px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; }
+        .filter-btn.active { background: var(--cyber-yellow); color: #000; }
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
+        .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 5px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; }
+        .card.is-top { border: 1px solid var(--cyber-yellow); }
+        .poster-container { position: relative; width: 100%; padding-top: 150%; }
+        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .title { color: var(--neon-blue); font-size: 0.9rem; font-weight: 700; }
+        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 8px; font-family: 'Orbitron'; font-size: 0.6rem; cursor: pointer; }
+        #stats { font-size: 0.7rem; color: var(--neon-purple); margin-bottom: 5px; }
     </style>
 </head>
 <body>
-    <div class="scanline"></div>
     <header>
         <div id="stats">HUB STATUS: INITIALIZING...</div>
         <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1.2rem;">SACRIFICE HUB</div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="SEARCH BY TITLE OR DIRECTOR..." oninput="filterMovies()">
+            <input type="text" id="searchInput" placeholder="SEARCH..." oninput="filterMovies()">
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
         </div>
     </header>
 
-    <div class="movie-grid" id="container">
-        <!-- Сюда прилетят фильмы -->
-    </div>
+    <div class="movie-grid" id="container"></div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = '#050505';
-
         let allMovies = [];
         let showOnlyTop = false;
 
         async function load() {
             try {
-                const stats = document.getElementById('stats');
-                stats.innerText = "HUB STATUS: CONNECTING TO AMVERA...";
-                
-                // Исправленный адрес со слэшем на конце
-                const apiUrl = 'https://metal-art-mozlik1984.amvera.io/';
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
+                document.getElementById('stats').innerText = "HUB STATUS: CONNECTING...";
+                const response = await fetch('https://metal-art-mozlik1984.amvera.io/');
+                if (!response.ok) throw new Error(response.status);
                 allMovies = await response.json();
-                
-                stats.innerText = `HUB STATUS: ONLINE | ${allMovies.length} MOVIES LOADED`;
+                document.getElementById('stats').innerText = `HUB STATUS: ONLINE | ${allMovies.length} MOVIES`;
                 render(allMovies);
             } catch (e) {
-                console.error(e);
-                document.getElementById('stats').innerText = `HUB STATUS: ERROR [${e.message}]`;
-                document.getElementById('container').innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #ff0055; padding: 20px;">SYSTEM FAILURE: ${e.message}<br>PLEASE RESTART BOT</div>`;
+                document.getElementById('stats').innerText = "HUB STATUS: ERROR [" + e.message + "]";
             }
         }
 
         function render(movies) {
             const container = document.getElementById('container');
             container.innerHTML = '';
-            
-            if (movies.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #aaa;">NO MOVIES FOUND IN SECTOR</div>';
-                return;
-            }
-
             movies.forEach(m => {
                 const card = document.createElement('div');
                 card.className = `card ${m.is_top ? 'is-top' : ''}`;
-                
-                // Используем m.title и m.img (как отдаёт твой API)
-                // m.title || 'Untitled' - защита от пустых названий в базе
                 card.innerHTML = `
                     <div class="poster-container">
-                        ${m.is_top ? '<div class="top-badge">🏆 TOP 100</div>' : ''}
                         <img class="poster" src="${m.img || 'https://via.placeholder.com'}" loading="lazy">
                     </div>
                     <div class="info">
-                        <div>
-                            <div class="title">${m.title || 'UNKNOWN DATA'}</div>
-                            <div class="director">${m.director || 'Unknown Director'}</div>
-                        </div>
+                        <div class="title">${m.title || 'UNKNOWN'}</div>
                         <button class="sacrifice-btn" onclick="selectMovie(${m.id})">SACRIFICE</button>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(card);
             });
         }
 
         function filterMovies() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            let filtered = allMovies.filter(m => {
-                const titleMatch = m.title && m.title.toLowerCase().includes(query);
-                const directorMatch = m.director && m.director.toLowerCase().includes(query);
-                return titleMatch || directorMatch;
-            });
-            
-            if (showOnlyTop) {
-                filtered = filtered.filter(m => m.is_top === 1);
-            }
-            
-            render(filtered);
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            let f = allMovies.filter(m => m.title && m.title.toLowerCase().includes(q));
+            if (showOnlyTop) f = f.filter(m => m.is_top === 1);
+            render(f);
         }
 
         function toggleTopFilter() {
@@ -265,14 +88,10 @@
         }
 
         function selectMovie(id) {
-            // Отправляем ID боту
-            if (tg.sendData) {
-                tg.sendData(JSON.stringify({action: "select", id: id}));
-                tg.close();
-            }
+            tg.sendData(JSON.stringify({action: "select", id: id}));
+            tg.close();
         }
 
-        // Запуск загрузки
         load();
     </script>
 </body>
