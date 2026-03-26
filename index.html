@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SACRIFICE HUB</title>
-    <script src="https://telegram.org"></script>
+    <!-- ЗАЩИТА: Склеиваем библиотеку Telegram -->
+    <script>
+        var script = document.createElement('script');
+        var p1 = 'https://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
+        script.src = p1 + p2 + p3;
+        document.head.appendChild(script);
+    </script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
         :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
@@ -36,14 +42,16 @@
         </div>
     </header>
 
-    <div class="movie-grid" id="container">
-        <!-- КАРТОЧКИ ПОЯВЯТСЯ ЗДЕСЬ -->
-    </div>
+    <div class="movie-grid" id="container"></div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+        // Ждем, пока загрузится библиотека Telegram
+        setTimeout(() => {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            }
+        }, 500);
 
         let allMovies = [];
         let showOnlyTop = false;
@@ -55,28 +63,26 @@
             try {
                 stats.innerText = "HUB STATUS: ESTABLISHING CONNECTION...";
                 
-                // Используем уникальный параметр ?t= для обхода кэша
-                const timestamp = new Date().getTime();
-                const apiUrl = 'https://metal-art-mozlik1984.amvera.io/' + timestamp;
+                // ЗАЩИТА: Склеиваем адрес API Amvera
+                var protocol = 'https' + '://';
+                var domain = 'metal-art-mozlik1984.amvera.io' + '/';
+                var apiUrl = protocol + domain + '?v=' + new Date().getTime();
                 
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' }
                 });
 
-                if (!response.ok) throw new Error('HTTP_ERROR_' + response.status);
+                if (!response.ok) throw new Error('HTTP_' + response.status);
 
                 allMovies = await response.json();
-                
-                if (!Array.isArray(allMovies)) throw new Error('INVALID_DATA_FORMAT');
-
-                stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' MOVIES LOADED';
+                stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' MOVIES';
                 render(allMovies);
 
             } catch (e) {
-                console.error('Load Error:', e);
+                console.error(e);
                 stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']';
-                container.innerHTML = '<div class="error-msg">SYSTEM FAILURE: ' + e.message + '<br><br>CHECK API STATUS OR RESTART</div>';
+                container.innerHTML = '<div class="error-msg">SYSTEM FAILURE: ' + e.message + '</div>';
             }
         }
 
@@ -84,17 +90,13 @@
             const container = document.getElementById('container');
             container.innerHTML = '';
             
-            if (movies.length === 0) {
-                container.innerHTML = '<div class="error-msg">NO DATA FOUND IN THIS SECTOR</div>';
-                return;
-            }
-
             movies.forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'card' + (m.is_top ? ' is-top' : '');
                 
-                // Заглушка для фото, если img равно null
-                const posterImg = m.img && m.img.startsWith('http') ? m.img : 'https://via.placeholder.com';
+                // Склеиваем адрес заглушки, чтобы не обрезало
+                var ph = 'https' + '://' + '://via.placeholder.com';
+                var posterImg = m.img && m.img.includes('http') ? m.img : ph;
 
                 card.innerHTML = `
                     <div class="poster-container">
@@ -116,11 +118,7 @@
                 const directorStr = String(m.director || '').toLowerCase();
                 return titleStr.includes(q) || directorStr.includes(q);
             });
-            
-            if (showOnlyTop) {
-                filtered = filtered.filter(m => m.is_top === 1);
-            }
-            
+            if (showOnlyTop) filtered = filtered.filter(m => m.is_top === 1);
             render(filtered);
         }
 
@@ -131,16 +129,12 @@
         }
 
         function selectMovie(id) {
-            try {
-                const data = JSON.stringify({action: "select", id: id});
-                tg.sendData(data);
-                tg.close();
-            } catch (err) {
-                alert("Use Telegram to select movies");
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.sendData(JSON.stringify({action: "select", id: id}));
+                window.Telegram.WebApp.close();
             }
         }
 
-        // Старт
         load();
     </script>
 </body>
