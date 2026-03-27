@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CULT HUB v8.0</title>
+    <title>CULT HUB v8.1</title>
     <script>
         var script = document.createElement('script');
         var p1 = 'https' + '://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
@@ -15,9 +15,9 @@
         :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
         body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-        .search-container { display: flex; gap: 8px; margin-top: 10px; }
-        input { flex: 1; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
-        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.6rem; border-radius: 4px; transition: 0.2s; }
+        .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        input { flex: 1; min-width: 120px; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
+        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
         .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
         .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; }
@@ -27,8 +27,6 @@
         .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
-
-        /* ПЛЕЕР */
         #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
         .video-wrapper { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
         .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
@@ -42,27 +40,29 @@
 
     <header>
         <div id="stats">HUB STATUS: INITIALIZING...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.0</span></div>
+        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.1</span></div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="TITLE, DIRECTOR..." oninput="filterMovies()">
+            <input type="text" id="searchInput" placeholder="SEARCH..." oninput="filterMovies()">
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
+            <button class="filter-btn" id="myVoidFilter" onclick="loadMyArchive()">MY VOID</button>
         </div>
     </header>
 
     <div class="movie-grid" id="container"></div>
-        <script>
+
+    <script>
         var tg = window.Telegram.WebApp;
         setTimeout(function() { if(tg) { tg.ready(); tg.expand(); } }, 500);
 
         var allMovies = [];
         var showOnlyTop = false;
+        var showOnlyMy = false;
 
         async function load() {
             var stats = document.getElementById('stats');
             try {
                 stats.innerText = "HUB STATUS: SYNCING DATA...";
-                var p = 'https' + '://'; 
-                var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var apiUrl = p + d + '?v=' + new Date().getTime();
                 var response = await fetch(apiUrl);
                 allMovies = await response.json();
@@ -71,7 +71,30 @@
             } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
         }
 
-                        function render(movies) {
+        async function loadMyArchive() {
+            var stats = document.getElementById('stats');
+            var btn = document.getElementById('myVoidFilter');
+            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+
+            if (!uid) { tg.showAlert("VOID ERROR: USER NOT FOUND"); return; }
+
+            showOnlyMy = !showOnlyMy;
+            btn.classList.toggle('active');
+
+            if (showOnlyMy) {
+                stats.innerText = "OPENING YOUR PERSONAL ARCHIVE...";
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var url = p + d + 'my_archive?user_id=' + uid;
+                try {
+                    var response = await fetch(url);
+                    var myMovies = await response.json();
+                    stats.innerText = 'MY VOID: ' + myMovies.length + ' ENTITIES';
+                    render(myMovies);
+                } catch (e) { stats.innerText = "ERROR LOADING ARCHIVE"; }
+            } else { load(); }
+        }
+
+        function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
             movies.forEach(function(m) {
@@ -79,13 +102,9 @@
                 card.className = 'card';
                 var sc = m.sacrifices || 0;
                 var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
-                
-                // Извлекаем ID видео: сначала пробуем t_id, если нет - парсим из trailer
-                var tid = m.t_id;
-                if (!tid || tid === "None") { tid = m.trailer; }
+                var tid = m.t_id; if (!tid || tid === "None") { tid = m.trailer; }
                 
                 var h = '';
-                // Передаем tid в функцию openVideo
                 h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
                 h += '<img class="poster" src="' + img + '" loading="lazy">';
                 h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
@@ -94,7 +113,6 @@
                 h += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
                 h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
                 h += '</div>';
-                
                 card.innerHTML = h;
                 container.appendChild(card);
             });
@@ -102,15 +120,13 @@
 
         function openVideo(tid) {
             if (!tid || tid === "None" || tid.length < 5) {
-                tg.showAlert("NO DIRECT LINK. USE THE BOT CARD.");
-                return;
+                tg.showAlert("RITUAL ERROR: NO ID"); return;
             }
-            var cleanId = tid.replace('TOP', '').replace('top', '').trim();
+            var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
             var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
-            var p2 = '?autoplay=1' + '&' + 'mute=1' + '&' + 'playsinline=1' + '&' + 'rel=0';
-            var embedUrl = p1 + cleanId + p2;
+            var embedUrl = p1 + cleanId + '?playsinline=1';
             cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
             layer.style.display = 'flex';
         }
@@ -125,9 +141,7 @@
             var filtered = allMovies.filter(function(m) {
                 return (String(m.title) + String(m.director) + String(m.genre)).toLowerCase().includes(q);
             });
-            if (showOnlyTop) {
-                filtered = filtered.filter(function(m) { return m.is_top === 1; });
-            }
+            if (showOnlyTop) { filtered = filtered.filter(function(m) { return m.is_top === 1; }); }
             render(filtered);
         }
 
@@ -140,31 +154,18 @@
         async function selectMovie(id) {
             if (!tg) return;
             var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-            
             if (uid) {
-                var p = 'https' + '://'; 
-                var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var url = p + d + 'select?id=' + id + '&user_id=' + uid;
-                
                 document.getElementById('stats').innerText = "RITUAL: SUMMONING CARD...";
-                
                 try {
-                    // 1. Пытаемся вызвать API бота напрямую
-                    var controller = new AbortController();
-                    var timeoutId = setTimeout(function() { controller.abort(); }, 3000); // 3 сек на ответ
-                    
-                    var response = await fetch(url, { signal: controller.signal });
-                    if (response.ok) {
-                        setTimeout(function(){ tg.close(); }, 100);
-                    } else { throw new Error('API Fail'); }
+                    var response = await fetch(url);
+                    if (response.ok) { setTimeout(function(){ tg.close(); }, 100); }
                 } catch (e) {
-                    // 2. Если API молчит, отправляем данные через Telegram (Fallback)
                     tg.sendData(JSON.stringify({action:"select", id:id}));
                     setTimeout(function(){ tg.close(); }, 200);
                 }
-            } else {
-                tg.close();
-            }
+            } else { tg.close(); }
         }
         load();
     </script>
