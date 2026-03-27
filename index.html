@@ -6,7 +6,7 @@
     <title>CULT HUB v8.0</title>
     <script>
         var script = document.createElement('script');
-        var p1 = 'https://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
+        var p1 = 'https' + '://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
         script.src = p1 + p2 + p3;
         document.head.appendChild(script);
     </script>
@@ -35,7 +35,6 @@
     </style>
 </head>
 <body>
-    <!-- Слой плеера -->
     <div id="video-layer">
         <div class="video-wrapper" id="player-container"></div>
         <button class="close-player-btn" onclick="closeVideo()">BACK TO HUB</button>
@@ -51,103 +50,105 @@
     </header>
 
     <div class="movie-grid" id="container"></div>
-
     <script>
-    let tg = window.Telegram.WebApp;
-    setTimeout(() => { if(tg) { tg.ready(); tg.expand(); } }, 500);
+        var tg = window.Telegram.WebApp;
+        setTimeout(function() { if(tg) { tg.ready(); tg.expand(); } }, 500);
 
-    let allMovies = [];
-    let showOnlyTop = false;
+        var allMovies = [];
+        var showOnlyTop = false;
 
-    // ЗАГРУЗКА ДАННЫХ
-    async function load() {
-        const stats = document.getElementById('stats');
-        try {
-            stats.innerText = "HUB STATUS: SYNCING DATA...";
-            var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-            var apiUrl = p + d + '?v=' + new Date().getTime();
-            const response = await fetch(apiUrl);
-            allMovies = await response.json();
-            stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
-            render(allMovies);
-        } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
-    }
-
-    // ОТРИСОВКА КАРТОЧЕК (ИСПРАВЛЕНО: Передаем поисковый запрос q)
-    function render(movies) {
-        const container = document.getElementById('container');
-        container.innerHTML = '';
-        movies.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'card' + (m.is_top ? ' is-top' : '');
-            const sc = m.sacrifices || 0;
-            var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
-            
-            card.innerHTML = `
-                <div class="poster-container" onclick="openVideo('${m.t_id}', '${m.q}')">
-                    <img class="poster" src="${img}" loading="lazy">
-                    <div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:'Orbitron';">💀 ${sc}</div>
-                </div>
-                <div class="info">
-                    <div><div class="title">${m.title || 'UNTITLED'}</div></div>
-                    <button class="sacrifice-btn" onclick="selectMovie(${m.id})">VIEW CARD</button>
-                </div>`;
-            container.appendChild(card);
-        });
-    }
-
-    // ЛОГИКА ПЛЕЕРА (ИСПРАВЛЕНО: Теперь умеет в автопоиск прямо в оверлее)
-    function openVideo(tid, q) {
-        const layer = document.getElementById('video-layer');
-        const cont = document.getElementById('player-container');
-        
-        // Если ID нет или он кривой — запускаем встроенный поиск YouTube
-        if (!tid || tid === "None" || tid.length < 5) {
-            var searchUrl = 'https://www.youtube.com' + q;
-            cont.innerHTML = `<iframe width="100%" height="100%" src="${searchUrl}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        } else {
-            // Если ID есть — стандартный embed
-            cont.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com{tid}?rel=0&modestbranding=1&autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        }
-        layer.style.display = 'flex';
-    }
-
-    function closeVideo() {
-        document.getElementById('player-container').innerHTML = '';
-        document.getElementById('video-layer').style.display = 'none';
-    }
-
-    function filterMovies() {
-        const q = document.getElementById('searchInput').value.toLowerCase().trim();
-        let filtered = allMovies.filter(m => String(m.title+m.director+m.genre).toLowerCase().includes(q));
-        if (showOnlyTop) filtered = filtered.filter(m => m.is_top === 1);
-        render(filtered);
-    }
-
-    function toggleTopFilter() {
-        showOnlyTop = !showOnlyTop;
-        document.getElementById('topFilter').classList.toggle('active');
-        filterMovies();
-    }
-
-    async function selectMovie(id) {
-        if (!tg) return;
-        const uid = tg.initDataUnsafe?.user?.id;
-        var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-        if (uid) {
+        async function load() {
+            var stats = document.getElementById('stats');
             try {
-                await fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
-                tg.close(); 
-            } catch (e) { 
-                tg.sendData(JSON.stringify({action:"select",id:id})); 
-                tg.close(); 
-            }
-        } else {
-            tg.sendData(JSON.stringify({action:"select",id:id}));
-            tg.close();
+                stats.innerText = "HUB STATUS: SYNCING DATA...";
+                var p = 'https' + '://'; 
+                var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var apiUrl = p + d + '?v=' + new Date().getTime();
+                var response = await fetch(apiUrl);
+                allMovies = await response.json();
+                stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
+                render(allMovies);
+            } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
         }
-    }
-    load();
-</script>
+
+        function render(movies) {
+            var container = document.getElementById('container');
+            container.innerHTML = '';
+            movies.forEach(function(m) {
+                var card = document.createElement('div');
+                card.className = 'card';
+                var sc = m.sacrifices || 0;
+                var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
+                
+                var html = '';
+                html += '<div class="poster-container" onclick="openVideo(\'' + m.t_id + '\')">';
+                html += '<img class="poster" src="' + img + '" loading="lazy">';
+                html += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
+                html += '</div>';
+                html += '<div class="info">';
+                html += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
+                html += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
+                html += '</div>';
+                
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        function openVideo(tid) {
+            if (!tid || tid === "None" || tid.length < 5) {
+                tg.showAlert("NO DIRECT LINK. USE THE BOT CARD.");
+                return;
+            }
+            // Очистка ID от слова TOP, если оно прилетело из базы
+            var cleanId = tid.replace('TOP', '').replace('top', '').trim();
+            
+            var layer = document.getElementById('video-layer');
+            var cont = document.getElementById('player-container');
+            
+            var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
+            var p2 = '?autoplay=1' + '&' + 'mute=1' + '&' + 'playsinline=1' + '&' + 'rel=0';
+            var embedUrl = p1 + cleanId + p2;
+            
+            cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            layer.style.display = 'flex';
+        }
+
+        function closeVideo() {
+            document.getElementById('player-container').innerHTML = '';
+            document.getElementById('video-layer').style.display = 'none';
+        }
+
+        function filterMovies() {
+            var q = document.getElementById('searchInput').value.toLowerCase().trim();
+            var filtered = allMovies.filter(function(m) {
+                return (String(m.title) + String(m.director) + String(m.genre)).toLowerCase().includes(q);
+            });
+            if (showOnlyTop) {
+                filtered = filtered.filter(function(m) { return m.is_top === 1; });
+            }
+            render(filtered);
+        }
+
+        function toggleTopFilter() {
+            showOnlyTop = !showOnlyTop;
+            document.getElementById('topFilter').classList.toggle('active');
+            filterMovies();
+        }
+
+        async function selectMovie(id) {
+            if (!tg) return;
+            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+            var p = 'https' + '://'; 
+            var d = 'metal-art-mozlik1984.amvera.io' + '/';
+            if (uid) {
+                try {
+                    await fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
+                    tg.close(); 
+                } catch (e) { tg.close(); }
+            } else { tg.close(); }
+        }
+        load();
+    </script>
 </body>
 </html>
