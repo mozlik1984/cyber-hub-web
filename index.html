@@ -100,17 +100,21 @@
             });
         }
 
-        function openVideo(tid) {
+                     function openVideo(tid) {
             if (!tid || tid === "None" || tid.length < 5) {
-                tg.showAlert("NO DIRECT LINK. USE THE BOT CARD.");
+                tg.showAlert("RITUAL ERROR: NO ID");
                 return;
             }
-            var cleanId = tid.replace('TOP', '').replace('top', '').trim();
+            // Очищаем ID от пробелов и слова TOP
+            var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
+            
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
+            
+            // Собираем URL правильно: обязательно через /embed/
             var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
-            var p2 = '?autoplay=1' + '&' + 'mute=1' + '&' + 'playsinline=1' + '&' + 'rel=0';
-            var embedUrl = p1 + cleanId + p2;
+            var embedUrl = p1 + cleanId + '?playsinline=1';
+            
             cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
             layer.style.display = 'flex';
         }
