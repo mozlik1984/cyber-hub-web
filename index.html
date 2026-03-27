@@ -71,7 +71,7 @@
             } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
         }
 
-        function render(movies) {
+                function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
             movies.forEach(function(m) {
@@ -80,17 +80,18 @@
                 var sc = m.sacrifices || 0;
                 var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
                 
-                var html = '';
-                html += '<div class="poster-container" onclick="openVideo(\'' + m.t_id + '\')">';
-                html += '<img class="poster" src="' + img + '" loading="lazy">';
-                html += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
-                html += '</div>';
-                html += '<div class="info">';
-                html += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
-                html += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
-                html += '</div>';
+                // Собираем HTML по кусочкам для безопасности
+                var h = '';
+                h += '<div class="poster-container" onclick="openVideo(\'' + m.t_id + '\')">';
+                h += '<img class="poster" src="' + img + '" loading="lazy">';
+                h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
+                h += '</div>';
+                h += '<div class="info">';
+                h += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
+                h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
+                h += '</div>';
                 
-                card.innerHTML = html;
+                card.innerHTML = h;
                 container.appendChild(card);
             });
         }
