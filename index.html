@@ -71,7 +71,7 @@
             } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
         }
 
-                function render(movies) {
+                        function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
             movies.forEach(function(m) {
@@ -80,9 +80,13 @@
                 var sc = m.sacrifices || 0;
                 var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
                 
-                // Собираем HTML по кусочкам для безопасности
+                // Извлекаем ID видео: сначала пробуем t_id, если нет - парсим из trailer
+                var tid = m.t_id;
+                if (!tid || tid === "None") { tid = m.trailer; }
+                
                 var h = '';
-                h += '<div class="poster-container" onclick="openVideo(\'' + m.t_id + '\')">';
+                // Передаем tid в функцию openVideo
+                h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
                 h += '<img class="poster" src="' + img + '" loading="lazy">';
                 h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
                 h += '</div>';
