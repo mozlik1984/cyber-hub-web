@@ -50,7 +50,7 @@
     </header>
 
     <div class="movie-grid" id="container"></div>
-    <script>
+        <script>
         var tg = window.Telegram.WebApp;
         setTimeout(function() { if(tg) { tg.ready(); tg.expand(); } }, 500);
 
@@ -100,16 +100,12 @@
                 tg.showAlert("NO DIRECT LINK. USE THE BOT CARD.");
                 return;
             }
-            // Очистка ID от слова TOP, если оно прилетело из базы
             var cleanId = tid.replace('TOP', '').replace('top', '').trim();
-            
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
-            
             var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
             var p2 = '?autoplay=1' + '&' + 'mute=1' + '&' + 'playsinline=1' + '&' + 'rel=0';
             var embedUrl = p1 + cleanId + p2;
-            
             cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
             layer.style.display = 'flex';
         }
@@ -139,14 +135,31 @@
         async function selectMovie(id) {
             if (!tg) return;
             var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-            var p = 'https' + '://'; 
-            var d = 'metal-art-mozlik1984.amvera.io' + '/';
+            
             if (uid) {
+                var p = 'https' + '://'; 
+                var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var url = p + d + 'select?id=' + id + '&user_id=' + uid;
+                
+                document.getElementById('stats').innerText = "RITUAL: SUMMONING CARD...";
+                
                 try {
-                    await fetch(p + d + 'select?id=' + id + '&user_id=' + uid);
-                    tg.close(); 
-                } catch (e) { tg.close(); }
-            } else { tg.close(); }
+                    // 1. Пытаемся вызвать API бота напрямую
+                    var controller = new AbortController();
+                    var timeoutId = setTimeout(function() { controller.abort(); }, 3000); // 3 сек на ответ
+                    
+                    var response = await fetch(url, { signal: controller.signal });
+                    if (response.ok) {
+                        setTimeout(function(){ tg.close(); }, 100);
+                    } else { throw new Error('API Fail'); }
+                } catch (e) {
+                    // 2. Если API молчит, отправляем данные через Telegram (Fallback)
+                    tg.sendData(JSON.stringify({action:"select", id:id}));
+                    setTimeout(function(){ tg.close(); }, 200);
+                }
+            } else {
+                tg.close();
+            }
         }
         load();
     </script>
