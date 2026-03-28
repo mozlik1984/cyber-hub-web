@@ -119,37 +119,29 @@
         }
 
                 function openVideo(tid) {
-            if (!tid || tid === "None" || tid.length < 5) {
-                tg.showAlert("RITUAL ERROR: NO ID"); return;
-            }
-            
-            // Очистка ID
-            var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
-            var layer = document.getElementById('video-layer');
-            var cont = document.getElementById('player-container');
-            
-            // Ссылка: playsinline=0 позволяет iOS открывать системный фуллскрин
-            var p1 = 'https://www.youtube.com';
-            var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=0&rel=0&fs=1';
-            
-            // Формируем iframe с полным набором разрешений
-            cont.innerHTML = '<iframe id="yt-player" width="100%" height="100%" src="' + embedUrl + '" ' +
-                             'frameborder="0" ' +
-                             'allow="autoplay; fullscreen; picture-in-picture; accelerometer; gyroscope" ' +
-                             'allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>';
-            
-            layer.style.display = 'flex';
+    if (!tid || tid === "None" || tid.length < 5) {
+        tg.showAlert("RITUAL ERROR: NO ID"); return;
+    }
 
-            // Попытка принудительного фуллскрина для контейнера (для Android/Desktop)
-            setTimeout(function() {
-                var iframe = document.getElementById('yt-player');
-                if (iframe.requestFullscreen) {
-                    iframe.requestFullscreen().catch(function(){});
-                } else if (iframe.webkitRequestFullscreen) {
-                    iframe.webkitRequestFullscreen();
-                }
-            }, 300);
-        }
+    // Твоя логика очистки ID, адаптированная под конкатенацию и защиту от сбоев
+    var rawId = tid.toString().split(' ')[0]; 
+    var cleanId = rawId.replace('TOP', '').trim();
+    
+    var layer = document.getElementById('video-layer');
+    var cont = document.getElementById('player-container');
+    
+    // Используем конкатенацию для сборки URL, как в твоем проекте
+    var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
+    var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1';
+    
+    // Вставляем iframe с полным набором атрибутов для активации кнопки фуллскрина
+    cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" ' +
+                     'frameborder="0" ' +
+                     'allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" ' +
+                     'allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>';
+    
+    layer.style.display = 'flex';
+}
 
         function closeVideo() {
             // Остановка видео перед закрытием
