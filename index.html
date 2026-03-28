@@ -118,22 +118,50 @@
             });
         }
 
-        function openVideo(tid) {
+                function openVideo(tid) {
             if (!tid || tid === "None" || tid.length < 5) {
                 tg.showAlert("RITUAL ERROR: NO ID"); return;
             }
+            
+            // Очистка ID
             var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
-            var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
-            var embedUrl = p1 + cleanId + '?playsinline=1';
-            cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            
+            // Ссылка: playsinline=0 позволяет iOS открывать системный фуллскрин
+            var p1 = 'https://www.youtube.com';
+            var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=0&rel=0&fs=1';
+            
+            // Формируем iframe с полным набором разрешений
+            cont.innerHTML = '<iframe id="yt-player" width="100%" height="100%" src="' + embedUrl + '" ' +
+                             'frameborder="0" ' +
+                             'allow="autoplay; fullscreen; picture-in-picture; accelerometer; gyroscope" ' +
+                             'allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>';
+            
             layer.style.display = 'flex';
+
+            // Попытка принудительного фуллскрина для контейнера (для Android/Desktop)
+            setTimeout(function() {
+                var iframe = document.getElementById('yt-player');
+                if (iframe.requestFullscreen) {
+                    iframe.requestFullscreen().catch(function(){});
+                } else if (iframe.webkitRequestFullscreen) {
+                    iframe.webkitRequestFullscreen();
+                }
+            }, 300);
         }
 
         function closeVideo() {
-            document.getElementById('player-container').innerHTML = '';
+            // Остановка видео перед закрытием
+            var cont = document.getElementById('player-container');
+            cont.innerHTML = '';
             document.getElementById('video-layer').style.display = 'none';
+            
+            // Выход из фуллскрина если он был активен
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+                else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            }
         }
 
         function filterMovies() {
