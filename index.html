@@ -68,14 +68,21 @@
         var showOnlyTop = false;
         var showOnlyMy = false;
 
-        async function load() {
+                async function load() {
             var stats = document.getElementById('stats');
             try {
                 stats.innerText = "HUB STATUS: SYNCING DATA...";
                 var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var apiUrl = p + d + '?v=' + new Date().getTime();
+                
                 var response = await fetch(apiUrl);
-                allMovies = await response.json();
+                var data = await response.json();
+
+                // ФИЛЬТР ДУБЛЕЙ: оставляем только уникальные ID
+                allMovies = data.filter((movie, index, self) =>
+                    index === self.findIndex((m) => m.id === movie.id)
+                );
+
                 stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
                 render(allMovies);
             } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
