@@ -20,51 +20,34 @@
         .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
         .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
-        /* Обновленная карточка с эффектом появления */
-.card { 
-    background: var(--card-bg); 
-    border: 1px solid rgba(188, 19, 254, 0.3); 
-    border-radius: 4px; 
-    overflow: hidden; 
-    display: flex; 
-    flex-direction: column; 
-    position: relative;
-    opacity: 0; /* Начальное состояние для анимации */
-    transform: translateY(20px);
-    transition: box-shadow 0.4s ease;
-    animation: summonCard 0.6s ease forwards;
-}
+                /* Замени этот блок */
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(188, 19, 254, 0.15); 
+            border-radius: 4px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            transition: 0.3s; 
+            position: relative;
+            /* ЭФФЕКТ ПОЯВЛЕНИЯ */
+            opacity: 0;
+            transform: translateY(20px);
+            animation: summonCard 0.6s ease forwards;
+        }
 
-/* Эффект неонового свечения при клике/активности */
-.card:active {
-    box-shadow: 0 0 15px var(--neon-purple);
-    border-color: var(--neon-purple);
-}
-
-/* Анимация "Жертвоприношения" (появления) */
-@keyframes summonCard {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Тонкая неоновая линия под заголовком */
-.title {
-    border-left: 2px solid var(--neon-blue);
-    padding-left: 5px;
-    margin-left: 2px;
-}
-
-/* Свечение для кнопок */
-.sacrifice-btn {
-    box-shadow: 0 0 5px rgba(188, 19, 254, 0.4);
-    transition: 0.3s;
-}
-.sacrifice-btn:active {
-    box-shadow: 0 0 15px var(--neon-purple);
-    transform: scale(0.98);
-}
+        /* Добавь это в самый конец блока <style> перед </style> */
+        @keyframes summonCard {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
+        .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
+        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
         #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
         .video-wrapper { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
@@ -135,14 +118,15 @@
 
                 function render(movies) {
             var container = document.getElementById('container');
-            container.innerHTML = ''; 
-
+            container.innerHTML = '';
+            
+            // Добавили index для расчета задержки
             movies.forEach(function(m, index) {
                 var card = document.createElement('div');
                 card.className = 'card';
                 
-                // Тот самый эффект задержки появления
-                card.style.animationDelay = (index * 0.05) + 's'; 
+                // КАЖДАЯ СЛЕДУЮЩАЯ КАРТОЧКА ПОЯВЛЯЕТСЯ ЧУТЬ ПОЗЖЕ
+                card.style.animationDelay = (index * 0.05) + 's';
                 
                 var sc = m.sacrifices || 0;
                 var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
@@ -157,36 +141,22 @@
                 h += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
                 h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
                 h += '</div>';
-                
                 card.innerHTML = h;
                 container.appendChild(card);
             });
         }
 
-                function openVideo(tid) {
+        function openVideo(tid) {
             if (!tid || tid === "None" || tid.length < 5) {
                 tg.showAlert("RITUAL ERROR: NO ID"); return;
             }
-            
-            // Твоя стабильная очистка ID
-            var rawId = tid.toString().split(' ');
-            var cleanId = rawId[0].replace('TOP', '').trim();
-            
+            var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
-            
-            // Ссылка: playsinline=1 (чтобы не вылетало сразу), fs=1 (разрешить фуллскрин)
             var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
-            var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1&rel=0';
-            
-            // Рендерим плеер с полным доступом к кнопкам YouTube
-            cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" ' +
-                             'frameborder="0" ' +
-                             'allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" ' +
-                             'allowfullscreen></iframe>';
-            
+            var embedUrl = p1 + cleanId + '?playsinline=1';
+            cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
             layer.style.display = 'flex';
-            if (tg.expand) { tg.expand(); }
         }
 
         function closeVideo() {
