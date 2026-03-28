@@ -12,37 +12,25 @@
     </script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-        :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-        .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-        input { flex: 1; min-width: 120px; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
-        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
-        .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
-        .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
-                /* Замени этот блок */
-        .card { 
-            background: var(--card-bg); 
-            border: 1px solid rgba(188, 19, 254, 0.15); 
-            border-radius: 4px; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            transition: 0.3s; 
-            position: relative;
-            /* ЭФФЕКТ ПОЯВЛЕНИЯ */
-            opacity: 0;
-            transform: translateY(20px);
-            animation: summonCard 0.6s ease forwards;
-        }
+            :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
+    body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+    header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
+    .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+    input { flex: 1; min-width: 120px; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
+    .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
+    .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
+    .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+    
+    /* Карточка с эффектом появления */
+    .card { 
+        background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
+        opacity: 0; transform: translateY(20px); animation: summonCard 0.6s ease forwards;
+    }
 
-        /* Добавь это в самый конец блока <style> перед </style> */
-        @keyframes summonCard {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    @keyframes summonCard {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
         .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
@@ -116,22 +104,16 @@
             } else { load(); }
         }
 
-                function render(movies) {
+                        function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
-            
-            // Добавили index для расчета задержки
             movies.forEach(function(m, index) {
                 var card = document.createElement('div');
                 card.className = 'card';
-                
-                // КАЖДАЯ СЛЕДУЮЩАЯ КАРТОЧКА ПОЯВЛЯЕТСЯ ЧУТЬ ПОЗЖЕ
                 card.style.animationDelay = (index * 0.05) + 's';
-                
                 var sc = m.sacrifices || 0;
                 var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
                 var tid = m.t_id; if (!tid || tid === "None") { tid = m.trailer; }
-                
                 var h = '';
                 h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
                 h += '<img class="poster" src="' + img + '" loading="lazy">';
