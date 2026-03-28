@@ -118,42 +118,48 @@
             });
         }
 
-                function openVideo(tid) {
-    if (!tid || tid === "None" || tid.length < 5) {
-        tg.showAlert("RITUAL ERROR: NO ID"); return;
-    }
+                        function openVideo(tid) {
+            if (!tid || tid === "None" || tid.length < 5) {
+                tg.showAlert("RITUAL ERROR: NO ID"); return;
+            }
+            
+            // Защищенная обработка ID (берем первый элемент если пришла строка со ссылкой)
+            var rawId = tid.toString().split(' ')[0];
+            var cleanId = rawId.replace('TOP', '').trim();
+            
+            var layer = document.getElementById('video-layer');
+            var cont = document.getElementById('player-container');
+            
+            // Твоя фирменная склейка ссылок через +
+            var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
+            var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1&rel=0';
+            
+            // Рендерим плеер с максимальными правами на Fullscreen
+            cont.innerHTML = '<iframe id="yt-iframe" width="100%" height="100%" src="' + embedUrl + '" ' +
+                             'frameborder="0" ' +
+                             'allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" ' +
+                             'webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true"></iframe>';
+            
+            layer.style.display = 'flex';
 
-    // Твоя логика очистки ID, адаптированная под конкатенацию и защиту от сбоев
-    var rawId = tid.toString().split(' ')[0]; 
-    var cleanId = rawId.replace('TOP', '').trim();
-    
-    var layer = document.getElementById('video-layer');
-    var cont = document.getElementById('player-container');
-    
-    // Используем конкатенацию для сборки URL, как в твоем проекте
-    var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
-    var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1';
-    
-    // Вставляем iframe с полным набором атрибутов для активации кнопки фуллскрина
-    cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" ' +
-                     'frameborder="0" ' +
-                     'allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" ' +
-                     'allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>';
-    
-    layer.style.display = 'flex';
-}
+            // Трюк для Telegram: принудительно разворачиваем шторку WebApp на максимум
+            if (tg.expand) { tg.expand(); }
+
+            // Попытка программно активировать фуллскрин контейнера (для Android)
+            setTimeout(function() {
+                var pBox = document.getElementById('player-container');
+                if (pBox.requestFullscreen) { pBox.requestFullscreen().catch(function(){}); }
+                else if (pBox.webkitRequestFullscreen) { pBox.webkitRequestFullscreen(); }
+            }, 400);
+        }
 
         function closeVideo() {
-            // Остановка видео перед закрытием
-            var cont = document.getElementById('player-container');
-            cont.innerHTML = '';
-            document.getElementById('video-layer').style.display = 'none';
+            // Выходим из фуллскрина, если браузер в нем находится
+            if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
             
-            // Выход из фуллскрина если он был активен
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                if (document.exitFullscreen) { document.exitFullscreen(); }
-                else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-            }
+            document.getElementById('player-container').innerHTML = '';
+            document.getElementById('video-layer').style.display = 'none';
         }
 
         function filterMovies() {
