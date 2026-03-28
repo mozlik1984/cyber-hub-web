@@ -28,6 +28,22 @@
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
         #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        #video-layer.full {
+    padding: 0;
+    background: #000;
+}
+#video-layer.full .video-wrapper {
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    box-shadow: none;
+}
+#video-layer.full .close-player-btn {
+    position: absolute;
+    bottom: 20px;
+    opacity: 0.5;
+    z-index: 1001;
+}
         .video-wrapper { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
         .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
     </style>
@@ -118,48 +134,38 @@
             });
         }
 
-                        function openVideo(tid) {
+                                function openVideo(tid) {
             if (!tid || tid === "None" || tid.length < 5) {
                 tg.showAlert("RITUAL ERROR: NO ID"); return;
             }
             
-            // Защищенная обработка ID (берем первый элемент если пришла строка со ссылкой)
-            var rawId = tid.toString().split(' ')[0];
-            var cleanId = rawId.replace('TOP', '').trim();
+            // Безопасный ID (берем первое слово из строки)
+            var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
             
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
             
-            // Твоя фирменная склейка ссылок через +
+            // Ссылка с параметром fs=1 и склейкой +
             var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
             var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1&rel=0';
             
-            // Рендерим плеер с максимальными правами на Fullscreen
-            cont.innerHTML = '<iframe id="yt-iframe" width="100%" height="100%" src="' + embedUrl + '" ' +
-                             'frameborder="0" ' +
-                             'allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" ' +
-                             'webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true"></iframe>';
+            // Добавляем класс .full для принудительного фуллскрина
+            layer.classList.add('full');
+            
+            cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" ' +
+                             'frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>';
             
             layer.style.display = 'flex';
-
-            // Трюк для Telegram: принудительно разворачиваем шторку WebApp на максимум
+            
+            // Разворачиваем шторку Telegram на максимум
             if (tg.expand) { tg.expand(); }
-
-            // Попытка программно активировать фуллскрин контейнера (для Android)
-            setTimeout(function() {
-                var pBox = document.getElementById('player-container');
-                if (pBox.requestFullscreen) { pBox.requestFullscreen().catch(function(){}); }
-                else if (pBox.webkitRequestFullscreen) { pBox.webkitRequestFullscreen(); }
-            }, 400);
         }
 
         function closeVideo() {
-            // Выходим из фуллскрина, если браузер в нем находится
-            if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
-            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-            
+            var layer = document.getElementById('video-layer');
+            layer.classList.remove('full'); // Снимаем фуллскрин
             document.getElementById('player-container').innerHTML = '';
-            document.getElementById('video-layer').style.display = 'none';
+            layer.style.display = 'none';
         }
 
         function filterMovies() {
