@@ -27,21 +27,46 @@
         .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
-        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        #video-layer.full {
-    padding: 0;
-    background: #000;
+        #video-layer { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: #000; /* Только черный фон для кино */
+    z-index: 1000; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
 }
-#video-layer.full .video-wrapper {
-    width: 100vw;
-    height: 100vh;
+
+/* Видео на весь экран без рамок */
+.video-wrapper { 
+    width: 100%; 
+    height: 100%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#video-layer iframe {
+    width: 100%;
+    height: 100%;
     border: none;
-    box-shadow: none;
 }
-#video-layer.full .close-player-btn {
+
+/* Кнопка поверх видео, чтобы не занимала место */
+.close-player-btn { 
     position: absolute;
     bottom: 20px;
-    opacity: 0.5;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(248, 239, 0, 0.8); /* Полупрозрачный неон */
+    color: #000; 
+    padding: 8px 20px; 
+    font-family: 'Orbitron'; 
+    font-size: 0.7rem; 
+    cursor: pointer; 
+    border-radius: 4px;
     z-index: 1001;
 }
         .video-wrapper { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
@@ -134,32 +159,29 @@
             });
         }
 
-                                function openVideo(tid) {
-            if (!tid || tid === "None" || tid.length < 5) {
-                tg.showAlert("RITUAL ERROR: NO ID"); return;
-            }
-            
-            // Безопасный ID (берем первое слово из строки)
-            var cleanId = tid.toString().split(' ')[0].replace('TOP', '').trim();
-            
-            var layer = document.getElementById('video-layer');
-            var cont = document.getElementById('player-container');
-            
-            // Ссылка с параметром fs=1 и склейкой +
-            var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
-            var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1&rel=0';
-            
-            // Добавляем класс .full для принудительного фуллскрина
-            layer.classList.add('full');
-            
-            cont.innerHTML = '<iframe width="100%" height="100%" src="' + embedUrl + '" ' +
-                             'frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>';
-            
-            layer.style.display = 'flex';
-            
-            // Разворачиваем шторку Telegram на максимум
-            if (tg.expand) { tg.expand(); }
-        }
+         function openVideo(tid) {
+    if (!tid || tid === "None" || tid.length < 5) {
+        tg.showAlert("RITUAL ERROR: NO ID"); return;
+    }
+    
+    // Твоя логика очистки ID (с исправлением индекса)
+    var rawId = tid.toString().split(' ');
+    var cleanId = rawId[0].replace('TOP', '').trim();
+    
+    var layer = document.getElementById('video-layer');
+    var cont = document.getElementById('player-container');
+    
+    // Ссылка: playsinline=1 для iOS, fs=1 для кнопки
+    var p1 = 'https' + '://' + 'www.youtube.com' + '/embed/';
+    var embedUrl = p1 + cleanId + '?autoplay=1&playsinline=1&fs=1&enablejsapi=1';
+    
+    cont.innerHTML = '<iframe src="' + embedUrl + '" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+    
+    layer.style.display = 'flex';
+    
+    // Принудительный разворот шторки Telegram
+    if (tg.expand) { tg.expand(); }
+}
 
         function closeVideo() {
             var layer = document.getElementById('video-layer');
