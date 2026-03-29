@@ -39,12 +39,14 @@
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
         /* Найди эти блоки и замени/дополни */
 .video-wrapper { 
-    width: 90%; 
-    height: 300px; /* Фиксированная высота для предсказуемости */
+    width: 92%; 
+    height: 380px; /* Фиксированная высота для стабильности */
     border: 1px solid var(--neon-blue); 
-    box-shadow: 0 0 20px var(--neon-blue); 
+    box-shadow: 0 0 25px rgba(5, 217, 232, 0.5); 
+    overflow: hidden;
     display: flex;
     flex-direction: column;
+    background: #000;
 }
 
 #video-layer { 
@@ -160,25 +162,24 @@
         tg.showAlert("RITUAL ERROR: NO ID"); return;
     }
     
-    // 1. ЖЕЛЕЗОБЕТОННАЯ ОЧИСТКА ID
-    var input = String(tid).trim(); // Превращаем в строку
-    var parts = input.split(' ');   // Разбиваем по пробелу
-    var firstPart = parts[0];       // Берем только ПЕРВОЕ слово (сам ID)
-    var cleanId = firstPart.replace(/TOP/gi, ''); // Убираем TOP, если он приклеился
+    // 1. УЛЬТРА-НАДЕЖНАЯ ОЧИСТКА: берем только первые 11 символов ID
+    var inputStr = String(tid).trim();
+    var cleanId = inputStr.substring(0, 11); 
     
     var layer = document.getElementById('video-layer');
     var cont = document.getElementById('player-container');
     
-    // 2. ССЫЛКИ С ЯВНЫМ УКАЗАНИЕМ ПРОТОКОЛА HTTPS
-    var embedUrl = "https" + "://" + "://www.youtube-nocookie.com" + cleanId + "?rel=0&playsinline=1&modestbranding=1";
-    var watchUrl = "https" + "://" + "://www.youtube.com" + cleanId;
+    // 2. ССЫЛКИ С ЯВНЫМ ПРОТОКОЛОМ (строго https://)
+    var p = "https" + "://" ;
+    var embedUrl = p + "://www.youtube-nocookie.com" + cleanId + "?rel=0&playsinline=1&modestbranding=1";
+    var watchUrl = p + "://www.youtube.com" + cleanId;
 
-    // 3. ОБНОВЛЕННАЯ ВЕРСТКА: Плеер сверху, кнопка снизу
+    // 3. ВЕРСТКА: Плеер + Кнопка (с фиксированными отступами)
     cont.innerHTML = 
         '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
             '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
-            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #444;">' +
-                '🔴 ПЛЕЕР ЗАБЛОКИРОВАН? СМОТРЕТЬ НА YOUTUBE' +
+            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:15px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:11px; text-align:center; font-weight:bold; border-top:2px solid #222;">' +
+                '🔴 СМОТРЕТЬ НА YOUTUBE (EXTERNAL)' +
             '</a>' +
         '</div>';
         
