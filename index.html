@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CULT HUB v8.1</title>
+    <title>CULT HUB v8.4</title>
     <script>
         var script = document.createElement('script');
         var p1 = 'https' + '://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
@@ -12,75 +12,71 @@
     </script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-    :root { 
-        --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; 
-        --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); 
-    }
+        :root { 
+            --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; 
+            --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); 
+        }
 
-    /* 1. Эффект зернистого шума - ТЕПЕРЬ ПОД ВСЕМ */
-    body::before {
-        content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: url('https://grainy-gradients.vercel.app');
-        opacity: 0.07; 
-        pointer-events: none; /* ЧТОБЫ КЛИКИ ПРОХОДИЛИ СКВОЗЬ ШУМ */
-        z-index: 0; 
-    }
+        /* 1. Эффект зернистого шума (ПОД ВСЕМ) */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app');
+            opacity: 0.07; pointer-events: none; z-index: 0; 
+        }
 
-    /* 2. Пульсирующая бездна */
-    body { 
-        background: #050505; /* Базовый цвет */
-        background: radial-gradient(circle at center, #151515 0%, #050505 100%);
-        animation: abyssPulse 8s infinite alternate;
-        color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; 
-    }
+        /* 2. Пульсирующая бездна */
+        body { 
+            background: #050505;
+            background: radial-gradient(circle at center, #151515 0%, #050505 100%);
+            animation: abyssPulse 8s infinite alternate;
+            color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; 
+        }
 
-    @keyframes abyssPulse { from { filter: brightness(0.8); } to { filter: brightness(1.2); } }
+        @keyframes abyssPulse { from { filter: brightness(0.8); } to { filter: brightness(1.2); } }
 
-    header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.9); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-    
-    .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-    input { flex: 1; min-width: 120px; background: #1a1a1a; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
-    
-    .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
-    .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
+        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
+        
+        .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        input { flex: 1; min-width: 120px; background: #1a1a1a; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
+        
+        .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
+        .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
 
-    /* 3. РЕЗИНОВАЯ СЕТКА */
-    .movie-grid { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); 
-        gap: 10px; padding: 10px; 
-        position: relative; z-index: 2; /* ВЫШЕ ШУМА */
-    }
+        /* 3. АДАПТИВНАЯ СЕТКА (Smart Grid) */
+        .movie-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); 
+            gap: 10px; padding: 10px; position: relative; z-index: 2;
+        }
 
-    @media (min-width: 768px) {
-        .movie-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-    }
-    
-    .card { 
-        background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
-        opacity: 0; transform: translateY(20px); animation: summonCard 0.6s ease forwards;
-        z-index: 5; /* ЕЩЕ ВЫШЕ */
-    }
+        @media (min-width: 768px) {
+            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 20px; }
+        }
+        
+        .card { 
+            background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
+            opacity: 0; transform: translateY(20px); animation: summonCard 0.6s ease forwards;
+            z-index: 5;
+        }
 
-    .card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transform: scale(1.03) rotate(1deg); z-index: 10; cursor: pointer; }
+        .card:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); transform: scale(1.03) rotate(1deg); z-index: 10; cursor: pointer; }
 
-    @keyframes summonCard { to { opacity: 1; transform: translateY(0); } }
+        @keyframes summonCard { to { opacity: 1; transform: translateY(0); } }
 
-    .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-    .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
-    .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
-    .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
-    
-    #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
-    #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0; }
-    
-    .video-wrapper { 
-        width: 90%; max-width: 800px; height: 380px; border: 1px solid var(--neon-blue); box-shadow: 0 0 25px rgba(5, 217, 232, 0.5); 
-        overflow: hidden; display: flex; flex-direction: column; background: #000; z-index: 2001;
-    }
-    .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; z-index: 2002; }
-</style>
+        .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        
+        .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
+        .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
+        .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
+        
+        #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
+        
+        /* PLAYER LAYER */
+        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0; }
+        .video-wrapper { width: 90%; max-width: 800px; height: 400px; border: 1px solid var(--neon-blue); box-shadow: 0 0 30px rgba(5, 217, 232, 0.4); overflow: hidden; display: flex; flex-direction: column; background: #000; z-index: 2001; }
+        .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; z-index: 2002; }
+    </style>
 </head>
 <body>
     <div id="video-layer">
@@ -90,7 +86,7 @@
 
     <header>
         <div id="stats">HUB STATUS: INITIALIZING...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.1</span></div>
+        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.4</span></div>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="SEARCH..." oninput="filterMovies()">
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
@@ -108,21 +104,22 @@
         var showOnlyTop = false;
         var showOnlyMy = false;
 
-                async function load() {
+        async function load() {
             var stats = document.getElementById('stats');
             try {
                 stats.innerText = "HUB STATUS: SYNCING DATA...";
-                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var p = 'https' + '://'; 
+                var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                // v=timestamp гарантирует загрузку свежих данных без кэша
                 var apiUrl = p + d + '?v=' + new Date().getTime();
                 
                 var response = await fetch(apiUrl);
                 var data = await response.json();
 
-                // ФИЛЬТР ДУБЛЕЙ: оставляем только уникальные ID
+                // ФИЛЬТР ДУБЛЕЙ
                 allMovies = data.filter((movie, index, self) =>
                     index === self.findIndex((m) => m.id === movie.id)
                 );
-
                 stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
                 render(allMovies);
             } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
@@ -151,65 +148,60 @@
             } else { load(); }
         }
 
-                        function render(movies) {
-    var container = document.getElementById('container');
-    container.innerHTML = '';
-    movies.forEach(function(m, index) {
-        var card = document.createElement('div');
-        card.className = 'card';
-        card.style.animationDelay = (index * 0.05) + 's';
-        
-        var tid = m.t_id || "dQw4w9WgXcQ"; // Заглушка, если ID нет
-        var img = m.img || 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
-        
-        // Фоллбэк: если основная картинка (img) не прогрузилась, ставим превью YouTube
-        var fallback = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
+        function render(movies) {
+            var container = document.getElementById('container');
+            container.innerHTML = '';
+            movies.forEach(function(m, index) {
+                var card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = (index * 0.05) + 's';
+                
+                var sc = m.sacrifices || 0;
+                var tid = m.t_id || "dQw4w9WgXcQ"; 
+                var img = (m.img && m.img.includes('http')) ? m.img : 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
+                
+                // Fallback: если постер из интернета не грузится, ставим обложку YouTube
+                var fb = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
 
-        var h = '';
-        h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
-        // ДОБАВИЛИ ONERROR
-        h += '<img class="poster" src="' + img + '" onerror="' + fallback + '" loading="lazy">';
-        h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); ...">💀 ' + (m.sacrifices || 0) + '</div>';
-        h += '</div>';
-        
-        // ... остальной код (title, button) без изменений
-        h += '<div class="info"><div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
-        h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button></div>';
-        
-        card.innerHTML = h;
-        container.appendChild(card);
-    });
-}
+                var h = '';
+                h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
+                h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
+                h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
+                h += '</div>';
+                h += '<div class="info">';
+                h += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
+                h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
+                h += '</div>';
+                
+                card.innerHTML = h;
+                container.appendChild(card);
+            });
+        }
 
         function openVideo(tid) {
-    if (!tid || tid === "None") {
-        tg.showAlert("RITUAL ERROR: NO ID"); return;
-    }
+            if (!tid || tid === "None" || tid.length < 5) {
+                tg.showAlert("RITUAL ERROR: NO ID"); return;
+            }
+            // Железная очистка ID
+            var id = String(tid).trim().substring(0, 11);
+            
+            var layer = document.getElementById('video-layer');
+            var cont = document.getElementById('player-container');
+            
+            var p = 'https' + '://';
+            var embedUrl = p + '://www.youtube-nocookie.com' + id + '?rel=0&playsinline=1&modestbranding=1';
+            var watchUrl = p + '://www.youtube.com' + id;
 
-    // Твоя азбука символов (как в боте)
-    var S = '/'; var C = ':'; var P = 'https' + C + S + S;
-    
-    // Очистка ID: берем только первые 11 символов
-    var id = String(tid).trim().substring(0, 11);
-    
-    var layer = document.getElementById('video-layer');
-    var cont = document.getElementById('player-container');
-
-    // СОБИРАЕМ URL ПРАВИЛЬНО (со всеми слэшами!)
-    // Итог будет: https://www.youtube-nocookie.com
-    var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
-    var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
-
-    cont.innerHTML = 
-        '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
-            '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
-            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">' +
-                '🔴 OPEN IN YOUTUBE APP' +
-            '</a>' +
-        '</div>';
-        
-    layer.style.display = 'flex';
-}
+            cont.innerHTML = 
+                '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
+                    '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
+                    '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">' +
+                        '🔴 OPEN IN YOUTUBE APP (EXTERNAL)' +
+                    '</a>' +
+                '</div>';
+            
+            layer.style.display = 'flex';
+        }
 
         function closeVideo() {
             document.getElementById('player-container').innerHTML = '';
