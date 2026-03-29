@@ -40,11 +40,11 @@
         /* Найди эти блоки и замени/дополни */
 .video-wrapper { 
     width: 90%; 
-    height: auto; /* Позволяем контейнеру расти под кнопку */
-    min-height: 250px; 
+    height: 300px; /* Фиксированная высота для предсказуемости */
     border: 1px solid var(--neon-blue); 
     box-shadow: 0 0 20px var(--neon-blue); 
-    padding: 5px; /* Внутренний отступ для красоты */
+    display: flex;
+    flex-direction: column;
 }
 
 #video-layer { 
@@ -160,22 +160,22 @@
         tg.showAlert("RITUAL ERROR: NO ID"); return;
     }
     
-    // ПРАВИЛЬНАЯ ОЧИСТКА ID
-    var rawId = tid.toString().split(' ')[0]; // Берем первое слово (до пробела)
-    var cleanId = rawId.replace(/TOP/gi, '').trim(); // Убираем TOP в любом регистре
+    // ПРАВИЛЬНАЯ ОЧИСТКА: превращаем в строку, берем первое слово, чистим от TOP
+    var strId = String(tid).split(' ')[0]; 
+    var cleanId = strId.replace(/TOP/gi, '').trim();
     
     var layer = document.getElementById('video-layer');
     var cont = document.getElementById('player-container');
     
-    // ССЫЛКИ С ЯВНЫМ ПРОТОКОЛОМ
+    // ССЫЛКИ
     var embedUrl = "https" + "://" + "://www.youtube-nocookie.com" + cleanId + "?rel=0&playsinline=1&modestbranding=1";
     var watchUrl = "https" + "://" + "://www.youtube.com" + cleanId;
 
-    // ВСТАВЛЯЕМ СТРУКТУРУ
+    // ВСТАВЛЯЕМ СТРУКТУРУ (добавил стили для корректного отображения внутри рамки)
     cont.innerHTML = 
-        '<div style="width:100%; height:100%; display:flex; flex-direction:column; gap:10px;">' +
-            '<iframe style="width:100%; flex-grow:1; border:0; border-radius:4px;" src="' + embedUrl + '" allowfullscreen></iframe>' +
-            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:10px; text-decoration:none; border-radius:4px; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; border:1px solid #fff; line-height:1.2;">' +
+        '<div style="width:100%; height:100%; display:flex; flex-direction:column;">' +
+            '<iframe style="width:100%; flex-grow:1; border:0; min-height:150px;" src="' + embedUrl + '" allowfullscreen></iframe>' +
+            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; border-radius:0 0 4px 4px; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid rgba(255,255,255,0.3);">' +
                 '🔴 ПЛЕЕР ЗАБЛОКИРОВАН? СМОТРЕТЬ НА YOUTUBE' +
             '</a>' +
         '</div>';
