@@ -160,22 +160,22 @@
         tg.showAlert("RITUAL ERROR: NO ID"); return;
     }
     
-    // ПРАВИЛЬНАЯ ОЧИСТКА: превращаем в строку, берем первое слово, чистим от TOP
-    var strId = String(tid).split(' ')[0]; 
-    var cleanId = strId.replace(/TOP/gi, '').trim();
+    // 1. ПРАВИЛЬНАЯ ОЧИСТКА: Превращаем в строку и забираем только ID до пробела
+    var input = String(tid).trim();
+    var cleanId = input.split(' ')[0].replace(/TOP/gi, ''); 
     
     var layer = document.getElementById('video-layer');
     var cont = document.getElementById('player-container');
     
-    // ССЫЛКИ
+    // 2. ССЫЛКИ С ПОЛНЫМ ПРОТОКОЛОМ (чтобы не кидало на GitHub)
     var embedUrl = "https" + "://" + "://www.youtube-nocookie.com" + cleanId + "?rel=0&playsinline=1&modestbranding=1";
     var watchUrl = "https" + "://" + "://www.youtube.com" + cleanId;
 
-    // ВСТАВЛЯЕМ СТРУКТУРУ (добавил стили для корректного отображения внутри рамки)
+    // 3. ОБНОВЛЕННАЯ ВЕРСТКА: Плеер сверху, кнопка снизу
     cont.innerHTML = 
-        '<div style="width:100%; height:100%; display:flex; flex-direction:column;">' +
-            '<iframe style="width:100%; flex-grow:1; border:0; min-height:150px;" src="' + embedUrl + '" allowfullscreen></iframe>' +
-            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; border-radius:0 0 4px 4px; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid rgba(255,255,255,0.3);">' +
+        '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
+            '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
+            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #444;">' +
                 '🔴 ПЛЕЕР ЗАБЛОКИРОВАН? СМОТРЕТЬ НА YOUTUBE' +
             '</a>' +
         '</div>';
