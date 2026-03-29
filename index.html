@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CULT HUB v8.4.1</title>
+    <title>CULT HUB v8.5</title>
     <script src="https://telegram.org"></script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
         :root { 
             --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; 
-            --bg-dark: #0a0a0a; --card-bg: rgba(25, 25, 25, 0.9); 
-        }
-
-        /* Зернистый шум теперь слабее и под текстом */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://grainy-gradients.vercel.app');
-            opacity: 0.04; pointer-events: none; z-index: 0; 
+            --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.95); 
         }
 
         body { 
-            background: var(--bg-dark);
-            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; 
+            background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; 
+            margin: 0; padding: 0; overflow-x: hidden; 
         }
 
-        header { position: sticky; top: 0; background: rgba(10, 10, 10, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
+        header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
         
         .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
         input { flex: 1; min-width: 120px; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
@@ -33,36 +25,36 @@
         .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
         .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
 
+        /* АДАПТИВНАЯ СЕТКА: 3 в ряд на телефоне, до 6-8 на ПК */
         .movie-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); 
-            gap: 10px; padding: 10px; position: relative; z-index: 2;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 8px; padding: 10px; 
         }
 
         @media (min-width: 768px) {
-            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 20px; }
+            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         }
         
         .card { 
-            background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
-            opacity: 1; /* Убрали анимацию появления для теста стабильности */
-            z-index: 5;
+            background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
         }
 
-        .card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transform: scale(1.02); z-index: 10; cursor: pointer; }
+        /* Эффект наведения для ПК */
+        .card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transform: scale(1.03); cursor: pointer; }
 
         .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         
         .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
         .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
         
-        #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; font-weight: bold; }
+        #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
         
-        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
-        .video-wrapper { width: 90%; max-width: 800px; height: 420px; border: 1px solid var(--neon-blue); box-shadow: 0 0 30px rgba(5, 217, 232, 0.4); overflow: hidden; display: flex; flex-direction: column; background: #000; z-index: 2001; }
-        .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; z-index: 2002; }
+        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        .video-wrapper { width: 90%; max-width: 800px; height: 380px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); overflow: hidden; display: flex; flex-direction: column; background: #000; }
+        .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -73,7 +65,7 @@
 
     <header>
         <div id="stats">HUB STATUS: INITIALIZING...</div>
-        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.4.1</span></div>
+        <div style="font-family: 'Orbitron'; color: var(--cyber-yellow); font-size: 1rem; letter-spacing: 1px;">CULT CINEMA HUB <span style="font-size: 0.6rem; opacity: 0.6;">v8.5</span></div>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="SEARCH..." oninput="filterMovies()">
             <button class="filter-btn" id="topFilter" onclick="toggleTopFilter()">TOP 100</button>
@@ -95,42 +87,35 @@
             var stats = document.getElementById('stats');
             try {
                 stats.innerText = "HUB STATUS: SYNCING DATA...";
-                var p = 'https' + '://'; 
-                var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var apiUrl = p + d + '?v=' + Date.now();
                 
                 var response = await fetch(apiUrl);
                 var data = await response.json();
 
-                // ФИЛЬТР ДУБЛЕЙ
                 allMovies = data.filter((movie, index, self) =>
                     index === self.findIndex((m) => m.id === movie.id)
                 );
                 stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
                 render(allMovies);
-            } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
+            } catch (e) { stats.innerText = 'HUB STATUS: ERROR'; }
         }
 
         async function loadMyArchive() {
             var stats = document.getElementById('stats');
             var btn = document.getElementById('myVoidFilter');
             var uid = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : null;
-
-            if (!uid) { tg.showAlert("VOID ERROR: USER NOT FOUND"); return; }
-
+            if (!uid) return;
             showOnlyMy = !showOnlyMy;
             btn.classList.toggle('active');
-
             if (showOnlyMy) {
-                stats.innerText = "OPENING YOUR PERSONAL ARCHIVE...";
                 var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var url = p + d + 'my_archive?user_id=' + uid;
                 try {
                     var response = await fetch(url);
                     var myMovies = await response.json();
-                    stats.innerText = 'MY VOID: ' + myMovies.length + ' ENTITIES';
                     render(myMovies);
-                } catch (e) { stats.innerText = "ERROR LOADING ARCHIVE"; }
+                } catch (e) { stats.innerText = "ERROR"; }
             } else { load(); }
         }
 
@@ -140,11 +125,8 @@
             movies.forEach(function(m) {
                 var card = document.createElement('div');
                 card.className = 'card';
-                
-                var tid = m.t_id || "dQw4w9WgXcQ"; 
+                var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11); 
                 var img = (m.img && m.img.includes('http')) ? m.img : 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
-                
-                // Fallback: если постер не грузится, ставим обложку YouTube
                 var fb = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
 
                 var h = '';
@@ -152,36 +134,24 @@
                 h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
                 h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + (m.sacrifices || 0) + '</div>';
                 h += '</div>';
-                h += '<div class="info">';
-                h += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
-                h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
-                h += '</div>';
-                
+                h += '<div class="info"><div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
+                h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button></div>';
                 card.innerHTML = h;
                 container.appendChild(card);
             });
         }
 
         function openVideo(tid) {
-            if (!tid || tid === "None") {
-                tg.showAlert("RITUAL ERROR: NO ID"); return;
-            }
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
-            
             var p = 'https' + '://';
-            var embedUrl = p + '://www.youtube-nocookie.com' + id + '?rel=0&playsinline=1&modestbranding=1';
+            var embedUrl = p + '://www.youtube-nocookie.com' + id + '?rel=0&playsinline=1';
             var watchUrl = p + '://www.youtube.com' + id;
 
-            cont.innerHTML = 
-                '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
-                    '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
-                    '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">' +
-                        '🔴 OPEN IN YOUTUBE APP' +
-                    '</a>' +
-                '</div>';
-            
+            cont.innerHTML = '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
+                '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
+                '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">🔴 OPEN IN YOUTUBE APP</a></div>';
             layer.style.display = 'flex';
         }
 
@@ -211,14 +181,7 @@
             if (uid) {
                 var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var url = p + d + 'select?id=' + id + '&user_id=' + uid;
-                document.getElementById('stats').innerText = "RITUAL: SUMMONING CARD...";
-                try {
-                    var response = await fetch(url);
-                    if (response.ok) { setTimeout(function(){ tg.close(); }, 100); }
-                } catch (e) {
-                    tg.sendData(JSON.stringify({action:"select", id:id}));
-                    setTimeout(function(){ tg.close(); }, 200);
-                }
+                try { await fetch(url); tg.close(); } catch (e) { tg.close(); }
             } else { tg.close(); }
         }
         load();
