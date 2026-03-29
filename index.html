@@ -160,14 +160,16 @@
         tg.showAlert("RITUAL ERROR: NO ID"); return;
     }
     
-    // 1. ПРАВИЛЬНАЯ ОЧИСТКА: Превращаем в строку и забираем только ID до пробела
-    var input = String(tid).trim();
-    var cleanId = input.split(' ')[0].replace(/TOP/gi, ''); 
+    // 1. ЖЕЛЕЗОБЕТОННАЯ ОЧИСТКА ID
+    var input = String(tid).trim(); // Превращаем в строку
+    var parts = input.split(' ');   // Разбиваем по пробелу
+    var firstPart = parts[0];       // Берем только ПЕРВОЕ слово (сам ID)
+    var cleanId = firstPart.replace(/TOP/gi, ''); // Убираем TOP, если он приклеился
     
     var layer = document.getElementById('video-layer');
     var cont = document.getElementById('player-container');
     
-    // 2. ССЫЛКИ С ПОЛНЫМ ПРОТОКОЛОМ (чтобы не кидало на GitHub)
+    // 2. ССЫЛКИ С ЯВНЫМ УКАЗАНИЕМ ПРОТОКОЛА HTTPS
     var embedUrl = "https" + "://" + "://www.youtube-nocookie.com" + cleanId + "?rel=0&playsinline=1&modestbranding=1";
     var watchUrl = "https" + "://" + "://www.youtube.com" + cleanId;
 
