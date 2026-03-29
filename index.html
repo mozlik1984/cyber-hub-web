@@ -13,19 +13,72 @@
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
             :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
-    body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+    /* 1. Эффект зернистого шума (вставляй сразу после <style>) */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('https://grainy-gradients.vercel.app');
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 2. Обновленный body (заменяет тот, что обведен красным) */
+body { 
+    background: radial-gradient(circle at center, #0a0a0a 0%, #050505 100%);
+    animation: abyssPulse 10s infinite alternate;
+    color: #fff; 
+    font-family: 'Rajdhani', sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    overflow-x: hidden; 
+}
+
+/* 3. Описание анимации (если его еще нет) */
+@keyframes abyssPulse {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.2); }
+}
     header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
     .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
     input { flex: 1; min-width: 120px; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
     .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
     .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
-    .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
-    
-    /* Карточка с эффектом появления */
-    .card { 
-        background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
-        opacity: 0; transform: translateY(20px); animation: summonCard 0.6s ease forwards;
+    /* ЗАМЕНИ СТАРЫЙ .movie-grid НА ЭТОТ */
+.movie-grid { 
+    display: grid; 
+    /* minmilk 100px — карточки не станут меньше сотки, 
+       1fr — они заполнят всё пространство */
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+    gap: 12px; 
+    padding: 15px; 
+}
+
+/* На больших экранах чуть увеличим карточки для красоты */
+@media (min-width: 768px) {
+    .movie-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+        gap: 20px;
     }
+}
+    
+    /* ... где-то здесь твой основной блок .card */
+.card { 
+    background: var(--card-bg); 
+    border: 1px solid rgba(188, 19, 254, 0.15); 
+    /* ... остальные стили карточки ... */
+}
+
+/* ВСТАВЛЯЙ СЮДА */
+.card:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue);
+    transform: scale(1.03) rotate(1deg); 
+    z-index: 10;
+    cursor: pointer;
+}
 
     @keyframes summonCard {
         to { opacity: 1; transform: translateY(0); }
