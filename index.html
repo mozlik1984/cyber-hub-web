@@ -161,22 +161,28 @@
     if (!tid || tid === "None") {
         tg.showAlert("RITUAL ERROR: NO ID"); return;
     }
+
+    // Твоя азбука символов (как в боте)
+    var S = '/'; var C = ':'; var P = 'https' + C + S + S;
     
-    // МАКСИМАЛЬНО ПРОСТАЯ ОЧИСТКА: превращаем в строку и оставляем только 11 знаков
+    // Очистка ID: берем только первые 11 символов
     var id = String(tid).trim().substring(0, 11);
     
     var layer = document.getElementById('video-layer');
     var cont = document.getElementById('player-container');
-    
-    // ССЫЛКИ С ЖЕСТКИМ HTTPS (чтобы не кидало на GitHub)
-    var embedUrl = "https://www.youtube-nocookie.com" + id + "?rel=0&playsinline=1&modestbranding=1";
-    var watchUrl = "https://www.youtube.com" + id;
 
-    // СТРУКТУРА (все стили в одну строку для надежности)
-    cont.innerHTML = '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
-        '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
-        '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:15px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">' +
-        '🔴 OPEN IN YOUTUBE APP</a></div>';
+    // СОБИРАЕМ URL ПРАВИЛЬНО (со всеми слэшами!)
+    // Итог будет: https://www.youtube-nocookie.com
+    var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
+    var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
+
+    cont.innerHTML = 
+        '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
+            '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
+            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">' +
+                '🔴 OPEN IN YOUTUBE APP' +
+            '</a>' +
+        '</div>';
         
     layer.style.display = 'flex';
 }
