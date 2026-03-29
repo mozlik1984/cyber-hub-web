@@ -4,56 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CULT HUB v8.5</title>
-    <script src="https://telegram.org"></script>
+    <script>
+        var script = document.createElement('script');
+        var p1 = 'https' + '://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
+        script.src = p1 + p2 + p3;
+        document.head.appendChild(script);
+    </script>
     <link href="https://fonts.googleapis.com" rel="stylesheet">
     <style>
-        :root { 
-            --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; 
-            --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.95); 
-        }
-
-        body { 
-            background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; 
-            margin: 0; padding: 0; overflow-x: hidden; 
-        }
-
+        :root { --neon-purple: #bc13fe; --neon-blue: #05d9e8; --cyber-yellow: #f8ef00; --bg-dark: #050505; --card-bg: rgba(20, 20, 20, 0.9); }
+        body { background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         header { position: sticky; top: 0; background: rgba(5, 5, 5, 0.95); padding: 12px; z-index: 100; border-bottom: 1px solid var(--neon-purple); backdrop-filter: blur(10px); }
-        
         .search-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
         input { flex: 1; min-width: 120px; background: #151515; border: 1px solid var(--neon-blue); padding: 8px 12px; color: #fff; outline: none; font-family: 'Rajdhani'; font-size: 0.8rem; border-radius: 4px; }
-        
         .filter-btn { background: transparent; border: 1px solid var(--cyber-yellow); color: var(--cyber-yellow); padding: 5px 8px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.55rem; border-radius: 4px; transition: 0.2s; text-transform: uppercase; }
         .filter-btn.active { background: var(--cyber-yellow); color: #000; box-shadow: 0 0 10px var(--cyber-yellow); }
-
-        /* АДАПТИВНАЯ СЕТКА: 3 в ряд на телефоне, до 6-8 на ПК */
-        .movie-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-            gap: 8px; padding: 10px; 
-        }
-
-        @media (min-width: 768px) {
-            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        }
         
-        .card { 
-            background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative;
-        }
-
-        /* Эффект наведения для ПК */
-        .card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transform: scale(1.03); cursor: pointer; }
+        /* АДАПТИВНАЯ СЕТКА (Smart Grid) */
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; padding: 10px; }
+        @media (min-width: 768px) { .movie-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; } }
+        
+        .card { background: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; opacity: 0; transform: translateY(20px); animation: summonCard 0.6s ease forwards; }
+        .card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transform: scale(1.03); z-index: 10; cursor: pointer; }
+        @keyframes summonCard { to { opacity: 1; transform: translateY(0); } }
 
         .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        
+        .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .info { padding: 6px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to top, #000, transparent); }
         .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
-        
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
         
         #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .video-wrapper { width: 90%; max-width: 800px; height: 380px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); overflow: hidden; display: flex; flex-direction: column; background: #000; }
+        .video-wrapper { width: 92%; max-width: 800px; height: 380px; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); overflow: hidden; display: flex; flex-direction: column; background: #000; }
         .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
     </style>
 </head>
@@ -77,7 +60,7 @@
 
     <script>
         var tg = window.Telegram.WebApp;
-        if(tg) { tg.ready(); tg.expand(); }
+        setTimeout(function() { if(tg) { tg.ready(); tg.expand(); } }, 500);
 
         var allMovies = [];
         var showOnlyTop = false;
@@ -88,47 +71,43 @@
             try {
                 stats.innerText = "HUB STATUS: SYNCING DATA...";
                 var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-                var apiUrl = p + d + '?v=' + Date.now();
-                
+                var apiUrl = p + d + '?v=' + new Date().getTime();
                 var response = await fetch(apiUrl);
                 var data = await response.json();
-
-                allMovies = data.filter((movie, index, self) =>
-                    index === self.findIndex((m) => m.id === movie.id)
-                );
+                allMovies = data.filter((movie, index, self) => index === self.findIndex((m) => m.id === movie.id));
                 stats.innerText = 'HUB STATUS: ONLINE | ' + allMovies.length + ' ENTITIES';
                 render(allMovies);
-            } catch (e) { stats.innerText = 'HUB STATUS: ERROR'; }
+            } catch (e) { stats.innerText = 'HUB STATUS: ERROR [' + e.message + ']'; }
         }
 
         async function loadMyArchive() {
             var stats = document.getElementById('stats');
             var btn = document.getElementById('myVoidFilter');
-            var uid = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : null;
-            if (!uid) return;
+            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+            if (!uid) { tg.showAlert("VOID ERROR: USER NOT FOUND"); return; }
             showOnlyMy = !showOnlyMy;
             btn.classList.toggle('active');
             if (showOnlyMy) {
+                stats.innerText = "OPENING YOUR PERSONAL ARCHIVE...";
                 var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var url = p + d + 'my_archive?user_id=' + uid;
                 try {
                     var response = await fetch(url);
                     var myMovies = await response.json();
                     render(myMovies);
-                } catch (e) { stats.innerText = "ERROR"; }
+                } catch (e) { stats.innerText = "ERROR LOADING ARCHIVE"; }
             } else { load(); }
         }
-
         function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
-            movies.forEach(function(m) {
+            movies.forEach(function(m, index) {
                 var card = document.createElement('div');
                 card.className = 'card';
-                var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11); 
+                card.style.animationDelay = (index * 0.05) + 's';
+                var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11);
                 var img = (m.img && m.img.includes('http')) ? m.img : 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
                 var fb = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
-
                 var h = '';
                 h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
                 h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
@@ -145,39 +124,29 @@
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
-            var p = 'https' + '://';
-            var embedUrl = p + '://www.youtube-nocookie.com' + id + '?rel=0&playsinline=1';
-            var watchUrl = p + '://www.youtube.com' + id;
-
+            var S = '/'; var C = ':'; var P = 'https' + C + S + S;
+            var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
+            var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
             cont.innerHTML = '<div style="width:100%; height:100%; display:flex; flex-direction:column; background:#000;">' +
                 '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>' +
                 '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:12px; text-decoration:none; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; font-weight:bold; border-top:1px solid #333;">🔴 OPEN IN YOUTUBE APP</a></div>';
             layer.style.display = 'flex';
         }
 
-        function closeVideo() {
-            document.getElementById('player-container').innerHTML = '';
-            document.getElementById('video-layer').style.display = 'none';
-        }
+        function closeVideo() { document.getElementById('player-container').innerHTML = ''; document.getElementById('video-layer').style.display = 'none'; }
 
         function filterMovies() {
             var q = document.getElementById('searchInput').value.toLowerCase().trim();
-            var filtered = allMovies.filter(function(m) {
-                return (String(m.title) + String(m.director) + String(m.genre)).toLowerCase().includes(q);
-            });
+            var filtered = allMovies.filter(function(m) { return (String(m.title) + String(m.director) + String(m.genre)).toLowerCase().includes(q); });
             if (showOnlyTop) { filtered = filtered.filter(function(m) { return m.is_top === 1; }); }
             render(filtered);
         }
 
-        function toggleTopFilter() {
-            showOnlyTop = !showOnlyTop;
-            document.getElementById('topFilter').classList.toggle('active');
-            filterMovies();
-        }
+        function toggleTopFilter() { showOnlyTop = !showOnlyTop; document.getElementById('topFilter').classList.toggle('active'); filterMovies(); }
 
         async function selectMovie(id) {
             if (!tg) return;
-            var uid = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : null;
+            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
             if (uid) {
                 var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
                 var url = p + d + 'select?id=' + id + '&user_id=' + uid;
