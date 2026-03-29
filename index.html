@@ -134,28 +134,34 @@
         }
 
                         function render(movies) {
-            var container = document.getElementById('container');
-            container.innerHTML = '';
-            movies.forEach(function(m, index) {
-                var card = document.createElement('div');
-                card.className = 'card';
-                card.style.animationDelay = (index * 0.05) + 's';
-                var sc = m.sacrifices || 0;
-                var img = m.img && m.img.includes('http') ? m.img : 'https://via.placeholder.com';
-                var tid = m.t_id; if (!tid || tid === "None") { tid = m.trailer; }
-                var h = '';
-                h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
-                h += '<img class="poster" src="' + img + '" loading="lazy">';
-                h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + sc + '</div>';
-                h += '</div>';
-                h += '<div class="info">';
-                h += '<div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
-                h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button>';
-                h += '</div>';
-                card.innerHTML = h;
-                container.appendChild(card);
-            });
-        }
+    var container = document.getElementById('container');
+    container.innerHTML = '';
+    movies.forEach(function(m, index) {
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.style.animationDelay = (index * 0.05) + 's';
+        
+        var tid = m.t_id || "dQw4w9WgXcQ"; // Заглушка, если ID нет
+        var img = m.img || 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
+        
+        // Фоллбэк: если основная картинка (img) не прогрузилась, ставим превью YouTube
+        var fallback = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
+
+        var h = '';
+        h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\')">';
+        // ДОБАВИЛИ ONERROR
+        h += '<img class="poster" src="' + img + '" onerror="' + fallback + '" loading="lazy">';
+        h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); ...">💀 ' + (m.sacrifices || 0) + '</div>';
+        h += '</div>';
+        
+        // ... остальной код (title, button) без изменений
+        h += '<div class="info"><div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
+        h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button></div>';
+        
+        card.innerHTML = h;
+        container.appendChild(card);
+    });
+}
 
         function openVideo(tid) {
     if (!tid || tid === "None") {
