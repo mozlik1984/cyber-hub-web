@@ -37,8 +37,28 @@
         .title { color: var(--neon-blue); font-size: 0.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; height: 2.2em; overflow: hidden; text-transform: uppercase; font-family: 'Orbitron'; }
         .sacrifice-btn { width: 100%; background: linear-gradient(45deg, var(--neon-purple), #8a2be2); border: none; color: #fff; padding: 5px; font-family: 'Orbitron'; font-size: 0.5rem; cursor: pointer; text-transform: uppercase; border-radius: 2px; }
         #stats { font-size: 0.6rem; color: var(--neon-purple); margin-bottom: 4px; letter-spacing: 1px; }
-        #video-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .video-wrapper { width: 95%; aspect-ratio: 16/9; border: 1px solid var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
+        /* Найди эти блоки и замени/дополни */
+.video-wrapper { 
+    width: 90%; 
+    height: auto; /* Позволяем контейнеру расти под кнопку */
+    min-height: 250px; 
+    border: 1px solid var(--neon-blue); 
+    box-shadow: 0 0 20px var(--neon-blue); 
+    padding: 5px; /* Внутренний отступ для красоты */
+}
+
+#video-layer { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.98); 
+    z-index: 1000; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 20px 0; /* Отступы сверху и снизу */
+}
         .close-player-btn { margin-top: 25px; background: var(--cyber-yellow); color: #000; border: none; padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.8rem; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
     </style>
 </head>
@@ -140,26 +160,24 @@
         tg.showAlert("RITUAL ERROR: NO ID"); return;
     }
     
-    // Очистка ID (убираем метки TOP и лишние пробелы)
-    var cleanId = tid.toString().split(' ')[0].replace('TOP', '').replace('top', '').trim();
+    // ПРАВИЛЬНАЯ ОЧИСТКА ID
+    var rawId = tid.toString().split(' ')[0]; // Берем первое слово (до пробела)
+    var cleanId = rawId.replace(/TOP/gi, '').trim(); // Убираем TOP в любом регистре
     
     var layer = document.getElementById('video-layer');
     var cont = document.getElementById('player-container');
     
-    // Ссылки
+    // ССЫЛКИ С ЯВНЫМ ПРОТОКОЛОМ
     var embedUrl = "https" + "://" + "://www.youtube-nocookie.com" + cleanId + "?rel=0&playsinline=1&modestbranding=1";
     var watchUrl = "https" + "://" + "://www.youtube.com" + cleanId;
 
-    // Вставляем плеер И кнопку перехода (фоллбэк)
-    // Кнопка будет прямо под плеером, чтобы юзер не гадал
+    // ВСТАВЛЯЕМ СТРУКТУРУ
     cont.innerHTML = 
-        '<div style="width:100%; height:100%; position:relative;">' +
-            '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allowfullscreen></iframe>' +
-            '<div style="margin-top:15px; text-align:center;">' +
-                '<a href="' + watchUrl + '" target="_blank" style="background:#ff0000; color:#fff; padding:8px 15px; text-decoration:none; border-radius:4px; font-family:\'Orbitron\'; font-size:10px; border:1px solid #fff;">' +
-                    '🔴 ПЛЕЕР ЗАБЛОКИРОВАН? СМОТРЕТЬ НА YOUTUBE' +
-                '</a>' +
-            '</div>' +
+        '<div style="width:100%; height:100%; display:flex; flex-direction:column; gap:10px;">' +
+            '<iframe style="width:100%; flex-grow:1; border:0; border-radius:4px;" src="' + embedUrl + '" allowfullscreen></iframe>' +
+            '<a href="' + watchUrl + '" target="_blank" style="display:block; background:#ff0000; color:#fff; padding:10px; text-decoration:none; border-radius:4px; font-family:\'Orbitron\',sans-serif; font-size:10px; text-align:center; border:1px solid #fff; line-height:1.2;">' +
+                '🔴 ПЛЕЕР ЗАБЛОКИРОВАН? СМОТРЕТЬ НА YOUTUBE' +
+            '</a>' +
         '</div>';
         
     layer.style.display = 'flex';
