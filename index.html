@@ -133,36 +133,37 @@
             });
         }
 
-                function openVideo(tid, mid) {
+                        function openVideo(tid, mid) {
             var movie = allMovies.find(function(x) { return x.id == mid; });
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
-            var p = 'https' + '://';
             
-            // Чистая ссылка без лишних флагов для стабильности
-            var embedUrl = p + '://www.youtube.com' + id + '?autoplay=1&rel=0';
+            // СТРОГАЯ СКЛЕЙКА ПРОВЕРЕННЫМ МЕТОДОМ
+            var S = '/'; var C = ':'; var P = 'https' + C + S + S;
+            var embedUrl = P + 'www.youtube.com' + S + 'embed' + S + id + '?rel=0&autoplay=1';
+            var watchUrl = P + 'www.youtube.com' + S + 'watch' + Q + 'v' + E + id;
+            
             var desc = movie ? (movie.description || "ENCRYPTED DATA") : "DATA MISSING";
             if (desc.includes("ДАННЫЕ")) desc = "ENCRYPTED VOID PROTOCOL: DATA MISSING";
 
             var h = '<div class="player-inner" id="player-mirror">';
             
-            // FRONT: VIDEO FEED
+            // FRONT: THE VIDEO FEED
             h += '<div class="player-front">';
             h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allow="autoplay; fullscreen"></iframe>';
-            // Кнопки 50/50 в ряд
             h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
             h += '<button onclick="flipPlayer()" style="flex:1; background:var(--neon-purple); color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">MISSION LOG [i]</button>';
-            h += '<a href="' + p + '://www.youtube.com' + id + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
+            h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
             h += '</div>';
             h += '</div>';
 
-            // BACK: DESCRIPTION
+            // BACK: THE MISSION LOG
             h += '<div class="player-back" onclick="flipPlayer()">';
             h += '<div class="void-noise"></div>';
-            h += '<div style="font-family:\'Orbitron\'; color:var(--neon-blue); border-bottom:1px solid #333; padding-bottom:8px; font-size:0.6rem;">MISSION_OBJECTIVE // DATA_DECODED</div>';
-            h += '<div class="void-desc" style="font-size:0.85rem; margin-top:15px;">' + desc + '</div>';
-            h += '<div style="color:var(--cyber-yellow); font-family:\'Orbitron\'; font-size:0.5rem; text-align:center; opacity:0.6;">TAP TO RESUME INTERFACE</div>';
+            h += '<div style="font-family:\'Orbitron\'; color:var(--neon-blue); border-bottom:1px solid #333; padding-bottom:8px; font-size:0.6rem; letter-spacing:1px;">MISSION_OBJECTIVE // DATA_DECODED</div>';
+            h += '<div class="void-desc" style="font-size:0.85rem; margin-top:15px; color:#fff;">' + desc + '</div>';
+            h += '<div style="color:var(--cyber-yellow); font-family:\'Orbitron\'; font-size:0.5rem; text-align:center; opacity:0.6; margin-top:10px;">TAP TO RESUME INTERFACE</div>';
             h += '</div>';
 
             h += '</div>';
