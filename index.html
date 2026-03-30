@@ -107,21 +107,18 @@
             } else { load(); }
         }
 
-                function render(movies) {
+                        function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
             movies.forEach(function(m, index) {
                 var card = document.createElement('div');
                 card.className = 'card';
                 card.style.animationDelay = (index * 0.05) + 's';
-                
                 var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11);
-                var p = 'https' + '://';
-                var img = (m.img && m.img.includes('http')) ? m.img : p + '://img.youtube.com' + tid + '/maxresdefault.jpg';
-                var fb = "this.onerror=null;this.src='" + p + "://img.youtube.com" + tid + "/maxresdefault.jpg';";
-                
+                var img = (m.img && m.img.includes('http')) ? m.img : 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
+                var fb = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
                 var h = '';
-                // Клик по постеру теперь передает и ID фильма для поиска описания
+                // Добавляем ID в вызов функции
                 h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\', ' + m.id + ')">';
                 h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
                 h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + (m.sacrifices || 0) + '</div>';
@@ -133,37 +130,36 @@
             });
         }
 
-                        function openVideo(tid, mid) {
+        function openVideo(tid, mid) {
             var movie = allMovies.find(function(x) { return x.id == mid; });
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
             
-            // СТРОГАЯ СКЛЕЙКА ПРОВЕРЕННЫМ МЕТОДОМ
+            // ТВОИ ОРИГИНАЛЬНЫЕ ССЫЛКИ
             var S = '/'; var C = ':'; var P = 'https' + C + S + S;
-            var embedUrl = P + 'www.youtube.com' + S + 'embed' + S + id + '?rel=0&autoplay=1';
-            var watchUrl = P + 'www.youtube.com' + S + 'watch' + Q + 'v' + E + id;
+            var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
+            var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
             
-            var desc = movie ? (movie.description || "ENCRYPTED DATA") : "DATA MISSING";
-            if (desc.includes("ДАННЫЕ")) desc = "ENCRYPTED VOID PROTOCOL: DATA MISSING";
+            var desc = movie ? (movie.description || "DATA MISSING") : "DATA MISSING";
+            if (desc.includes("ДАННЫЕ")) desc = "DATA MISSING";
 
             var h = '<div class="player-inner" id="player-mirror">';
             
-            // FRONT: THE VIDEO FEED
-            h += '<div class="player-front">';
-            h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allow="autoplay; fullscreen"></iframe>';
+            // ЛИЦО: ТВОЙ РАБОЧИЙ ПЛЕЕР
+            h += '<div class="player-front" style="display:flex; flex-direction:column;">';
+            h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>';
             h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
-            h += '<button onclick="flipPlayer()" style="flex:1; background:var(--neon-purple); color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">MISSION LOG [i]</button>';
+            h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">INFO [i]</button>';
             h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
             h += '</div>';
             h += '</div>';
 
-            // BACK: THE MISSION LOG
+            // СПИНА: ОПИСАНИЕ
             h += '<div class="player-back" onclick="flipPlayer()">';
-            h += '<div class="void-noise"></div>';
-            h += '<div style="font-family:\'Orbitron\'; color:var(--neon-blue); border-bottom:1px solid #333; padding-bottom:8px; font-size:0.6rem; letter-spacing:1px;">MISSION_OBJECTIVE // DATA_DECODED</div>';
-            h += '<div class="void-desc" style="font-size:0.85rem; margin-top:15px; color:#fff;">' + desc + '</div>';
-            h += '<div style="color:var(--cyber-yellow); font-family:\'Orbitron\'; font-size:0.5rem; text-align:center; opacity:0.6; margin-top:10px;">TAP TO RESUME INTERFACE</div>';
+            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
+            h += '<div class="void-desc">' + desc + '</div>';
+            h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:10px;">TAP TO RESUME VIDEO</div>';
             h += '</div>';
 
             h += '</div>';
@@ -172,14 +168,11 @@
         }
 
         function flipPlayer() {
-            var mirror = document.getElementById('player-mirror');
-            if (mirror) mirror.classList.toggle('flipped');
+            var m = document.getElementById('player-mirror');
+            if (m) m.classList.toggle('flipped');
         }
 
-        function closeVideo() { 
-            document.getElementById('player-container').innerHTML = ''; 
-            document.getElementById('video-layer').style.display = 'none'; 
-        }
+        function closeVideo() { document.getElementById('player-container').innerHTML = ''; document.getElementById('video-layer').style.display = 'none'; }
 
         function filterMovies() {
             var q = document.getElementById('searchInput').value.toLowerCase().trim();
