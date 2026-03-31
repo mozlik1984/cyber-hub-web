@@ -22,13 +22,13 @@
         --card-bg: rgba(10, 10, 10, 0.9); 
     }
 
-    /* СКАНЛАЙНЫ ТОЛЬКО НА ФОНЕ BODY */
+    /* ФОН СО СКАНЛАЙНАМИ */
     body::before {
         content: " ";
         position: fixed;
         top: 0; left: 0; bottom: 0; right: 0;
         background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
-        z-index: 50; /* Ниже плеера, чтобы не мешать тексту */
+        z-index: 50;
         background-size: 100% 4px;
         pointer-events: none;
     }
@@ -38,7 +38,6 @@
         color: #fff; 
         font-family: 'Rajdhani', sans-serif; 
         margin: 0; padding: 0; 
-        overflow-x: hidden; 
         background-image: radial-gradient(circle at center, #1a0525 0%, #020202 100%);
     }
 
@@ -50,16 +49,37 @@
         backdrop-filter: blur(15px); 
     }
 
-    /* АДАПТИВНАЯ СЕТКА: от 2 на мобилках до 6+ на десктопе */
+    /* КНОПКИ ФИЛЬТРОВ: ЯРКАЯ ПОДСВЕТКА */
+    .filter-btn { 
+        background: transparent; border: 1px solid var(--cyber-yellow); 
+        color: var(--cyber-yellow); padding: 6px 10px; 
+        font-family: 'Orbitron'; font-size: 0.6rem; 
+        border-radius: 2px; transition: 0.3s;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+    
+    /* Состояние когда фильтр включен */
+    .filter-btn.active { 
+        background: var(--cyber-yellow) !important; 
+        color: #000 !important; 
+        box-shadow: 0 0 15px var(--cyber-yellow); 
+        font-weight: bold;
+    }
+
+    /* СЕТКА: ВОЗВРАТ К 3 В РЯД НА МОБИЛКАХ */
     .movie-grid { 
         display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); 
-        gap: 12px; 
-        padding: 15px; 
+        grid-template-columns: repeat(3, 1fr); /* Ровно 3 колонки */
+        gap: 8px; 
+        padding: 10px; 
     }
-    @media (min-width: 768px) { .movie-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; } }
-    @media (min-width: 1200px) { .movie-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
     
+    /* Для мониторов увеличиваем количество */
+    @media (min-width: 768px) { 
+        .movie-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; } 
+    }
+
     .card { 
         background: var(--card-bg); 
         border: 1px solid rgba(188, 19, 254, 0.3); 
@@ -73,61 +93,28 @@
     .poster-container { position: relative; width: 100%; aspect-ratio: 2/3; overflow: hidden; }
     .poster { width: 100%; height: 100%; object-fit: cover; }
 
-    .info { padding: 8px; background: #000; }
-    .title { color: var(--neon-blue); font-size: 0.7rem; font-family: 'Orbitron'; text-transform: uppercase; height: 2.4em; overflow: hidden; }
+    .info { padding: 5px; background: #000; display: flex; flex-direction: column; gap: 5px; }
+    .title { color: var(--neon-blue); font-size: 0.55rem; font-family: 'Orbitron'; text-transform: uppercase; height: 2.2em; overflow: hidden; line-height: 1.1; }
 
     .sacrifice-btn { 
         width: 100%; background: transparent; border: 1px solid var(--neon-purple); 
-        color: var(--neon-purple); padding: 6px; font-family: 'Orbitron'; 
-        font-size: 0.55rem; cursor: pointer; 
+        color: var(--neon-purple); padding: 4px; font-family: 'Orbitron'; 
+        font-size: 0.5rem; cursor: pointer; 
     }
 
-    /* VIDEO LAYER: ФИКСАЦИЯ ГЕОМЕТРИИ */
+    /* ПЛЕЕР */
     #video-layer { 
         display: none; position: fixed; top: 0; left: 0; 
         width: 100%; height: 100%; background: rgba(0,0,0,0.95); 
         z-index: 10000; flex-direction: column; align-items: center; justify-content: center; 
     }
-
-    .video-wrapper { 
-        width: 95%; 
-        max-width: 700px; 
-        aspect-ratio: 16 / 10; /* Жесткий формат, чтобы лицо и спина не разъезжались */
-        perspective: 2000px; 
-    }
-
+    .video-wrapper { width: 95%; max-width: 700px; aspect-ratio: 16 / 10; perspective: 2000px; }
     .player-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
     .player-inner.flipped { transform: rotateY(180deg); }
-
-    .player-front, .player-back { 
-        position: absolute; width: 100%; height: 100%; 
-        backface-visibility: hidden; 
-        border: 2px solid var(--neon-blue); 
-        background: #000; box-sizing: border-box; /* Важно для совпадения размеров */
-    }
-
-    .player-back { 
-        transform: rotateY(180deg); 
-        border-color: var(--neon-purple); 
-        display: flex; flex-direction: column; padding: 15px;
-        background: linear-gradient(135deg, #050505 0%, #10021a 100%);
-    }
-
-    .void-desc { 
-        font-family: 'Rajdhani', sans-serif; 
-        font-size: 1.2rem; /* Увеличили */
-        line-height: 1.4; color: var(--neon-blue); 
-        overflow-y: auto; flex-grow: 1; 
-        text-transform: uppercase; 
-        text-shadow: 0 0 10px rgba(5, 217, 232, 0.4);
-        scrollbar-width: none;
-    }
-
-    .close-player-btn { 
-        margin-top: 20px; background: transparent; color: var(--cyber-yellow); 
-        border: 1px solid var(--cyber-yellow); padding: 10px 30px; 
-        font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer;
-    }
+    .player-front, .player-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border: 2px solid var(--neon-blue); background: #000; box-sizing: border-box; }
+    .player-back { transform: rotateY(180deg); border-color: var(--neon-purple); display: flex; flex-direction: column; padding: 15px; background: linear-gradient(135deg, #050505 0%, #10021a 100%); }
+    .void-desc { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; line-height: 1.3; color: var(--neon-blue); overflow-y: auto; flex-grow: 1; text-transform: uppercase; scrollbar-width: none; }
+    .close-player-btn { margin-top: 20px; background: transparent; color: var(--cyber-yellow); border: 1px solid var(--cyber-yellow); padding: 10px 30px; font-family: 'Orbitron'; font-size: 0.7rem; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -263,18 +250,50 @@
             render(filtered);
         }
 
-        function toggleTopFilter() { showOnlyTop = !showOnlyTop; document.getElementById('topFilter').classList.toggle('active'); filterMovies(); }
+        function toggleTopFilter() {
+    var topBtn = document.getElementById('topFilter');
+    var voidBtn = document.getElementById('myVoidFilter');
 
-        async function selectMovie(id) {
-            if (!tg) return;
-            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-            if (uid) {
-                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-                var url = p + d + 'select?id=' + id + '&user_id=' + uid;
-                try { await fetch(url); tg.close(); } catch (e) { tg.close(); }
-            } else { tg.close(); }
-        }
-        load();
+    showOnlyTop = !showOnlyTop;
+    
+    if (showOnlyTop) {
+        showOnlyMy = false; // Выключаем "My Void"
+        voidBtn.classList.remove('active');
+        topBtn.classList.add('active');
+    } else {
+        topBtn.classList.remove('active');
+    }
+    filterMovies();
+}
+
+async function loadMyArchive() {
+    var stats = document.getElementById('stats');
+    var topBtn = document.getElementById('topFilter');
+    var voidBtn = document.getElementById('myVoidFilter');
+    var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+    
+    if (!uid) { tg.showAlert("VOID ERROR: USER NOT FOUND"); return; }
+
+    showOnlyMy = !showOnlyMy;
+
+    if (showOnlyMy) {
+        showOnlyTop = false; // Выключаем "Top 100"
+        topBtn.classList.remove('active');
+        voidBtn.classList.add('active');
+        
+        stats.innerText = "OPENING YOUR PERSONAL ARCHIVE...";
+        var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+        var url = p + d + 'my_archive?user_id=' + uid;
+        try {
+            var response = await fetch(url);
+            var myMovies = await response.json();
+            render(myMovies);
+        } catch (e) { stats.innerText = "ERROR LOADING ARCHIVE"; }
+    } else {
+        voidBtn.classList.remove('active');
+        load(); // Возвращаемся к общему списку
+    }
+}
     </script>
 </body>
 </html>
