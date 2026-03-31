@@ -107,18 +107,21 @@
             } else { load(); }
         }
 
-                        function render(movies) {
+                                function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
             movies.forEach(function(m, index) {
                 var card = document.createElement('div');
                 card.className = 'card';
                 card.style.animationDelay = (index * 0.05) + 's';
+                
+                // Исправленный расчет превью
                 var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11);
-                var img = (m.img && m.img.includes('http')) ? m.img : 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
-                var fb = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
+                var img = (m.img && m.img.includes('http')) ? m.img : 'https://youtube.com' + tid + '/maxresdefault.jpg';
+                var fb = "this.onerror=null;this.src='https://youtube.com" + tid + "/maxresdefault.jpg';";
+                
                 var h = '';
-                // Добавляем ID в вызов функции
+                // Передаем ID для поиска в массиве
                 h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\', ' + m.id + ')">';
                 h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
                 h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + (m.sacrifices || 0) + '</div>';
@@ -131,35 +134,40 @@
         }
 
         function openVideo(tid, mid) {
+            // Ищем фильм в загруженном массиве allMovies по ID
             var movie = allMovies.find(function(x) { return x.id == mid; });
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
             
-            // ТВОИ ОРИГИНАЛЬНЫЕ ССЫЛКИ
             var S = '/'; var C = ':'; var P = 'https' + C + S + S;
-            var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
+            var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1&autoplay=1';
             var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
             
-            var desc = movie ? (movie.description || "DATA MISSING") : "DATA MISSING";
-            if (desc.includes("ДАННЫЕ")) desc = "DATA MISSING";
+            // ИСПРАВЛЕННАЯ ЛОГИКА DESCRIPTION
+            var desc = "MISSION LOG ENCRYPTED...";
+            if (movie && movie.description) {
+                desc = movie.description;
+                // Убираем принудительную замену на "DATA MISSING"
+            }
 
             var h = '<div class="player-inner" id="player-mirror">';
             
-            // ЛИЦО: ТВОЙ РАБОЧИЙ ПЛЕЕР
+            // FRONT: Видео + Кнопка INFO
             h += '<div class="player-front" style="display:flex; flex-direction:column;">';
-            h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>';
+            h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
-            h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">INFO [i]</button>';
-            h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
+            h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:10px; cursor:pointer; font-weight:bold;">[i] MISSION LOG</button>';
+            h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:10px; font-weight:bold;">YOUTUBE APP</a>';
             h += '</div>';
             h += '</div>';
 
-            // СПИНА: ОПИСАНИЕ
+            // BACK: Описание (Void Mirror)
             h += '<div class="player-back" onclick="flipPlayer()">';
-            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
-            h += '<div class="void-desc">' + desc + '</div>';
-            h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:10px;">TAP TO RESUME VIDEO</div>';
+            h += '<div class="void-noise"></div>';
+            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #05d9e844; padding-bottom:8px; font-size:11px; margin-bottom:12px; letter-spacing:1px;">MISSION LOG // DATA_RECOVERY</div>';
+            h += '<div class="void-desc" style="font-family:\'Rajdhani\'; font-size:0.95rem; line-height:1.5; color:#fff; height:250px; overflow-y:auto; padding-right:5px;">' + desc + '</div>';
+            h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:9px; text-align:center; margin-top:15px; opacity:0.8; animation: pulse 2s infinite;">TAP TO RESUME VIDEO</div>';
             h += '</div>';
 
             h += '</div>';
