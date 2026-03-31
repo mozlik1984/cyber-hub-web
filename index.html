@@ -199,13 +199,12 @@
             });
         }
 
-        function openVideo(tid, mid) {
+                function openVideo(tid, mid) {
             var movie = allMovies.find(function(x) { return x.id == mid; });
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
             
-            // ТВОИ ОРИГИНАЛЬНЫЕ ССЫЛКИ
             var S = '/'; var C = ':'; var P = 'https' + C + S + S;
             var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
             var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
@@ -215,7 +214,6 @@
 
             var h = '<div class="player-inner" id="player-mirror">';
             
-            // ЛИЦО: ТВОЙ РАБОЧИЙ ПЛЕЕР
             h += '<div class="player-front" style="display:flex; flex-direction:column;">';
             h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>';
             h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
@@ -224,7 +222,6 @@
             h += '</div>';
             h += '</div>';
 
-            // СПИНА: ОПИСАНИЕ
             h += '<div class="player-back" onclick="flipPlayer()">';
             h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
             h += '<div class="void-desc" style="color:var(--neon-blue);">' + desc + '</div>';
@@ -251,49 +248,55 @@
         }
 
         function toggleTopFilter() {
-    var topBtn = document.getElementById('topFilter');
-    var voidBtn = document.getElementById('myVoidFilter');
+            var topBtn = document.getElementById('topFilter');
+            var voidBtn = document.getElementById('myVoidFilter');
+            showOnlyTop = !showOnlyTop;
+            if (showOnlyTop) {
+                showOnlyMy = false;
+                voidBtn.classList.remove('active');
+                topBtn.classList.add('active');
+            } else {
+                topBtn.classList.remove('active');
+            }
+            filterMovies();
+        }
 
-    showOnlyTop = !showOnlyTop;
-    
-    if (showOnlyTop) {
-        showOnlyMy = false; // Выключаем "My Void"
-        voidBtn.classList.remove('active');
-        topBtn.classList.add('active');
-    } else {
-        topBtn.classList.remove('active');
-    }
-    filterMovies();
-}
+        async function loadMyArchive() {
+            var stats = document.getElementById('stats');
+            var topBtn = document.getElementById('topFilter');
+            var voidBtn = document.getElementById('myVoidFilter');
+            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+            if (!uid) { tg.showAlert("VOID ERROR: USER NOT FOUND"); return; }
+            showOnlyMy = !showOnlyMy;
+            if (showOnlyMy) {
+                showOnlyTop = false;
+                topBtn.classList.remove('active');
+                voidBtn.classList.add('active');
+                stats.innerText = "OPENING YOUR PERSONAL ARCHIVE...";
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var url = p + d + 'my_archive?user_id=' + uid;
+                try {
+                    var response = await fetch(url);
+                    var myMovies = await response.json();
+                    render(myMovies);
+                } catch (e) { stats.innerText = "ERROR LOADING ARCHIVE"; }
+            } else {
+                voidBtn.classList.remove('active');
+                load();
+            }
+        }
 
-async function loadMyArchive() {
-    var stats = document.getElementById('stats');
-    var topBtn = document.getElementById('topFilter');
-    var voidBtn = document.getElementById('myVoidFilter');
-    var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-    
-    if (!uid) { tg.showAlert("VOID ERROR: USER NOT FOUND"); return; }
+        async function selectMovie(id) {
+            if (!tg) return;
+            var uid = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+            if (uid) {
+                var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
+                var url = p + d + 'select?id=' + id + '&user_id=' + uid;
+                try { await fetch(url); tg.close(); } catch (e) { tg.close(); }
+            } else { tg.close(); }
+        }
 
-    showOnlyMy = !showOnlyMy;
-
-    if (showOnlyMy) {
-        showOnlyTop = false; // Выключаем "Top 100"
-        topBtn.classList.remove('active');
-        voidBtn.classList.add('active');
-        
-        stats.innerText = "OPENING YOUR PERSONAL ARCHIVE...";
-        var p = 'https' + '://'; var d = 'metal-art-mozlik1984.amvera.io' + '/';
-        var url = p + d + 'my_archive?user_id=' + uid;
-        try {
-            var response = await fetch(url);
-            var myMovies = await response.json();
-            render(myMovies);
-        } catch (e) { stats.innerText = "ERROR LOADING ARCHIVE"; }
-    } else {
-        voidBtn.classList.remove('active');
-        load(); // Возвращаемся к общему списку
-    }
-}
+        load(); // <--- ВОТ ЭТО ЗАПУСКАЕТ ТВОЙ ХАБ
     </script>
 </body>
 </html>
