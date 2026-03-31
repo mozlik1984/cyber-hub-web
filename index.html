@@ -133,45 +133,42 @@
             });
         }
 
-                function openVideo(tid, mid) {
-            // 1. Ищем фильм в глобальном массиве
+                        function openVideo(tid, mid) {
+            // 1. Поиск фильма в глобальном массиве
             var movie = allMovies.find(function(x) { return x.id == mid; });
-            
-            // ЛОГ ДЛЯ ПРОВЕРКИ (Увидишь в консоли)
-            console.log("ID фильма:", mid, "Найденный объект:", movie);
-
             var id = String(tid).trim().substring(0, 11);
             var layer = document.getElementById('video-layer');
             var cont = document.getElementById('player-container');
             
+            // 2. ТВОЯ ОРИГИНАЛЬНАЯ СКЛЕЙКА ССЫЛОК
             var S = '/'; var C = ':'; var P = 'https' + C + S + S;
             var embedUrl = P + '://youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1&autoplay=1';
+            var watchUrl = P + '://youtube.com' + S + 'watch?v=' + id;
             
-            // 2. БЕРЕМ ОПИСАНИЕ ИЗ ОБЪЕКТА
+            // 3. ЛОГИКА ОПИСАНИЯ (Берем напрямую из объекта)
             var desc = "MISSION LOG ENCRYPTED...";
             if (movie && movie.description) {
                 desc = movie.description;
             } else if (movie) {
-                desc = "DESC_NULL_ERROR: RE-SYNC REQUIRED";
+                desc = "ДАННЫЕ ИЗЪЯТЫ ИЗ БЕЗДНЫ // RE-SYNC REQUIRED";
             }
 
             var h = '<div class="player-inner" id="player-mirror">';
             
-            // FRONT
-            h += '<div class="player-front" style="display:flex; flex-direction:column;">';
+            // ЛИЦО: Твой рабочий плеер + Кнопка INFO
+            h += '<div class="player-front" style="display:flex; flex-direction:column; background:#000;">';
             h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
             h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:10px; cursor:pointer; font-weight:bold;">[i] MISSION LOG</button>';
-            h += '<a href="https://youtube.com' + id + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:10px; font-weight:bold;">YOUTUBE APP</a>';
+            h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:10px; font-weight:bold;">YOUTUBE APP</a>';
             h += '</div>';
             h += '</div>';
 
-            // BACK (Зеркало Бездны)
-            h += '<div class="player-back" onclick="flipPlayer()">';
+            // СПИНА: Описание (Void Mirror)
+            h += '<div class="player-back" onclick="flipPlayer()" style="padding:20px; box-sizing:border-box; background:linear-gradient(135deg, #050505 0%, #150520 100%);">';
             h += '<div class="void-noise"></div>';
-            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #05d9e844; padding-bottom:8px; font-size:11px; margin-bottom:12px;">MISSION LOG // DATA_RECOVERY</div>';
-            // ВАЖНО: Добавил стиль для скролла
-            h += '<div class="void-desc" style="font-family:\'Rajdhani\'; font-size:0.95rem; line-height:1.4; color:#fff; max-height:220px; overflow-y:auto; padding-right:5px; white-space:pre-wrap;">' + desc + '</div>';
+            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #05d9e844; padding-bottom:8px; font-size:11px; margin-bottom:15px; letter-spacing:1px;">MISSION LOG // DATA_RECOVERY</div>';
+            h += '<div class="void-desc" style="font-family:\'Rajdhani\'; font-size:0.95rem; line-height:1.4; color:#fff; height:240px; overflow-y:auto; padding-right:8px; scrollbar-width:thin; white-space:pre-wrap;">' + desc + '</div>';
             h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:15px; opacity:0.6;">TAP TO RESUME VIDEO</div>';
             h += '</div>';
 
