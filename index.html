@@ -107,22 +107,18 @@
             } else { load(); }
         }
 
-                                function render(movies) {
+                        function render(movies) {
             var container = document.getElementById('container');
             container.innerHTML = '';
             movies.forEach(function(m, index) {
                 var card = document.createElement('div');
                 card.className = 'card';
                 card.style.animationDelay = (index * 0.05) + 's';
-                
-                // Внутри цикла movies.forEach в функции render:
-var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11);
-// Правильный путь к картинке YouTube: /vi/ID/
-var img = (m.img && m.img.includes('http')) ? m.img : 'https://youtube.com' + tid + '/maxresdefault.jpg';
-var fb = "this.onerror=null;this.src='https://youtube.com" + tid + "/maxresdefault.jpg';";
-                
+                var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11);
+                var img = (m.img && m.img.includes('http')) ? m.img : 'https://img.youtube.com' + tid + '/maxresdefault.jpg';
+                var fb = "this.onerror=null;this.src='https://img.youtube.com" + tid + "/maxresdefault.jpg';";
                 var h = '';
-                // Передаем ID для поиска в массиве
+                // Добавляем ID в вызов функции
                 h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\', ' + m.id + ')">';
                 h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
                 h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + (m.sacrifices || 0) + '</div>';
@@ -134,62 +130,42 @@ var fb = "this.onerror=null;this.src='https://youtube.com" + tid + "/maxresdefau
             });
         }
 
-                 function render(movies) {
-    var container = document.getElementById('container');
-    container.innerHTML = '';
-    movies.forEach(function(m, index) {
-        var card = document.createElement('div');
-        card.className = 'card';
-        card.style.animationDelay = (index * 0.05) + 's';
-        
-        // КОРРЕКТНЫЙ ПУТЬ К КАРТИНКЕ YOUTUBE (Склейка +)
-        var tid = String(m.t_id || "dQw4w9WgXcQ").trim().substring(0, 11);
-        var img = 'https' + '://' + '://youtube.com' + '/vi/' + tid + '/maxresdefault.jpg';
-        var fb = "this.onerror=null;this.src='https' + '://' + '://youtube.com' + '/vi/' + tid + '/maxresdefault.jpg';";
-        
-        var h = '';
-        h += '<div class="poster-container" onclick="openVideo(\'' + tid + '\', ' + m.id + ')">';
-        h += '<img class="poster" src="' + img + '" onerror="' + fb + '" loading="lazy">';
-        h += '<div style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:0.5rem; color:#f8ef00; border:1px solid #f8ef00; font-family:\'Orbitron\';">💀 ' + (m.sacrifices || 0) + '</div>';
-        h += '</div>';
-        h += '<div class="info"><div><div class="title">' + (m.title || 'UNTITLED') + '</div></div>';
-        h += '<button class="sacrifice-btn" onclick="selectMovie(' + m.id + ')">VIEW CARD</button></div>';
-        card.innerHTML = h;
-        container.appendChild(card);
-    });
-}
+        function openVideo(tid, mid) {
+            var movie = allMovies.find(function(x) { return x.id == mid; });
+            var id = String(tid).trim().substring(0, 11);
+            var layer = document.getElementById('video-layer');
+            var cont = document.getElementById('player-container');
+            
+            // ТВОИ ОРИГИНАЛЬНЫЕ ССЫЛКИ
+            var S = '/'; var C = ':'; var P = 'https' + C + S + S;
+            var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
+            var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
+            
+            var desc = movie ? (movie.description || "DATA MISSING") : "DATA MISSING";
+            if (desc.includes("ДАННЫЕ")) desc = "DATA MISSING";
 
-function openVideo(tid, mid) {
-    var movie = allMovies.find(function(x) { return x.id == mid; });
-    var id = String(tid).trim().substring(0, 11);
-    var layer = document.getElementById('video-layer');
-    var cont = document.getElementById('player-container');
-    
-    // ТВОИ ОРИГИНАЛЬНЫЕ ССЫЛКИ (Склейка +)
-    var S = '/'; var C = ':'; var P = 'https' + C + S + S;
-    var embedUrl = P + '://youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1&autoplay=1';
-    var watchUrl = P + '://youtube.com' + S + 'watch?v=' + id;
-    
-    var desc = (movie && movie.description) ? movie.description : "ДАННЫЕ ИЗЪЯТЫ ИЗ БЕЗДНЫ";
+            var h = '<div class="player-inner" id="player-mirror">';
+            
+            // ЛИЦО: ТВОЙ РАБОЧИЙ ПЛЕЕР
+            h += '<div class="player-front" style="display:flex; flex-direction:column;">';
+            h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>';
+            h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
+            h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">INFO [i]</button>';
+            h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
+            h += '</div>';
+            h += '</div>';
 
-    var h = '<div class="player-inner" id="player-mirror">';
-    h += '<div class="player-front" style="display:flex; flex-direction:column; background:#000;">';
-    h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-    h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
-    h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">INFO [i]</button>';
-    h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
-    h += '</div></div>';
+            // СПИНА: ОПИСАНИЕ
+            h += '<div class="player-back" onclick="flipPlayer()">';
+            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
+            h += '<div class="void-desc">' + desc + '</div>';
+            h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:10px;">TAP TO RESUME VIDEO</div>';
+            h += '</div>';
 
-    h += '<div class="player-back" onclick="flipPlayer()">';
-    h += '<div class="void-noise"></div>';
-    h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
-    h += '<div class="void-desc" style="font-family:\'Rajdhani\'; font-size:0.9rem; line-height:1.4; height:240px; overflow-y:auto; color:#eee;">' + desc + '</div>';
-    h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:10px;">TAP TO RESUME VIDEO</div>';
-    h += '</div></div>';
-
-    cont.innerHTML = h;
-    layer.style.display = 'flex';
-}
+            h += '</div>';
+            cont.innerHTML = h;
+            layer.style.display = 'flex';
+        }
 
         function flipPlayer() {
             var m = document.getElementById('player-mirror');
