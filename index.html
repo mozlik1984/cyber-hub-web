@@ -2,18 +2,22 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- ВОТ ЭТА СТРОКА РЕШИТ ПРОБЛЕМУ С БИТЫМИ ПОСТЕРАМИ -->
-    <meta name="referrer" content="no-referrer">
+    <!-- FIX 153: strict-origin-when-cross-origin лечит плеер и не ломает постеры -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CULT HUB v8.5</title>
+    <title>CULT HUB v8.7 (STABLE)</title>
+    
     <script>
         var script = document.createElement('script');
-        var p1 = 'https' + '://'; var p2 = 'telegram.org/js/'; var p3 = 'telegram-web-app.js';
+        var p1 = 'https' + '://'; 
+        var p2 = 'telegram.org/js/'; 
+        var p3 = 'telegram-web-app.js';
         script.src = p1 + p2 + p3;
         document.head.appendChild(script);
     </script>
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
     @import url('https://googleapis.com');
 
@@ -203,38 +207,44 @@
         }
 
                 function openVideo(tid, mid) {
-            var movie = allMovies.find(function(x) { return x.id == mid; });
-            var id = String(tid).trim().substring(0, 11);
-            var layer = document.getElementById('video-layer');
-            var cont = document.getElementById('player-container');
-            
-            var S = '/'; var C = ':'; var P = 'https' + C + S + S;
-            var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + '?rel=0&playsinline=1';
-            var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
-            
-            var desc = movie ? (movie.description || "DATA MISSING") : "DATA MISSING";
-            if (desc.includes("ДАННЫЕ")) desc = "DATA MISSING";
+    var movie = allMovies.find(function(x) { return x.id == mid; });
+    var id = String(tid).trim().substring(0, 11);
+    var layer = document.getElementById('video-layer');
+    var cont = document.getElementById('player-container');
+    
+    // Твоя база склейки
+    var S = '/'; var C = ':'; var P = 'https' + C + S + S;
+    
+    // FIX 153: Добавляем enablejsapi и origin в строку параметров
+    var params = '?rel=0&playsinline=1&enablejsapi=1&origin=' + window.location.origin;
+    
+    var embedUrl = P + 'www.youtube-nocookie.com' + S + 'embed' + S + id + params;
+    var watchUrl = P + 'www.youtube.com' + S + 'watch?v=' + id;
+    
+    var desc = movie ? (movie.description || "DATA MISSING") : "DATA MISSING";
+    if (desc.includes("ДАННЫЕ")) desc = "DATA MISSING";
 
-            var h = '<div class="player-inner" id="player-mirror">';
-            
-            h += '<div class="player-front" style="display:flex; flex-direction:column;">';
-            h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allowfullscreen></iframe>';
-            h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
-            h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">INFO [i]</button>';
-            h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
-            h += '</div>';
-            h += '</div>';
+    var h = '<div class="player-inner" id="player-mirror">';
+    
+    h += '<div class="player-front" style="display:flex; flex-direction:column;">';
+    // Добавляем referrerpolicy для обхода защит
+    h += '<iframe style="width:100%; flex-grow:1; border:0;" src="' + embedUrl + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    h += '<div style="display:flex; height:45px; border-top:1px solid #333;">';
+    h += '<button onclick="flipPlayer()" style="flex:1; background:#bc13fe; color:#fff; border:0; font-family:\'Orbitron\'; font-size:9px; cursor:pointer;">INFO [i]</button>';
+    h += '<a href="' + watchUrl + '" target="_blank" style="flex:1; background:#ff0000; color:#fff; text-decoration:none; display:flex; align-items:center; justify-content:center; font-family:\'Orbitron\'; font-size:9px; font-weight:bold;">YOUTUBE APP</a>';
+    h += '</div>';
+    h += '</div>';
 
-            h += '<div class="player-back" onclick="flipPlayer()">';
-            h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
-            h += '<div class="void-desc" style="color:var(--neon-blue);">' + desc + '</div>';
-            h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:10px;">TAP TO RESUME VIDEO</div>';
-            h += '</div>';
+    h += '<div class="player-back" onclick="flipPlayer()">';
+    h += '<div style="font-family:\'Orbitron\'; color:#05d9e8; border-bottom:1px solid #333; padding-bottom:5px; font-size:10px; margin-bottom:10px;">MISSION LOG // DATA_RECOVERY</div>';
+    h += '<div class="void-desc" style="color:var(--neon-blue);">' + desc + '</div>';
+    h += '<div style="color:#f8ef00; font-family:\'Orbitron\'; font-size:8px; text-align:center; margin-top:10px;">TAP TO RESUME VIDEO</div>';
+    h += '</div>';
 
-            h += '</div>';
-            cont.innerHTML = h;
-            layer.style.display = 'flex';
-        }
+    h += '</div>';
+    cont.innerHTML = h;
+    layer.style.display = 'flex';
+}
 
         function flipPlayer() {
             var m = document.getElementById('player-mirror');
